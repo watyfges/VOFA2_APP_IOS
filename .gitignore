@@ -1,6 +1,7 @@
 build/
 build_device/
 DerivedData/
+dist/
 *.xcuserstate
 xcuserdata/
 .DS_Store
