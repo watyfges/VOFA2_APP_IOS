@@ -18,6 +18,7 @@
 		9CF42513E27FB9A20953A50D /* TuningUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52053EE328F00BA021F875CE /* TuningUITests.swift */; };
 		9E08DBB8BFD9B07D2FEC9FED /* OneClickSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29917680368CB19BC1A5838B /* OneClickSheet.swift */; };
 		9EFD012B3AAC44B7DBCD7D3C /* PinFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22B20567213DE4575415EA3 /* PinFlowUITests.swift */; };
+		AF1C2C2519407B9F71A2C287 /* LegacyInclusionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38F83F428C26181967836A15 /* LegacyInclusionUITests.swift */; };
 		B1A507CDD94B76031491DB84 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3715B603C3FA2E6C21336EC5 /* AppDelegate.swift */; };
 		B90552F5C032154DBD8018F1 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8284CD5550D788B391AD9290 /* Theme.swift */; };
 		D7F2BAEA38548F5EA756FFC1 /* RemoteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95DA4BF33D852912260592B /* RemoteMessage.swift */; };
@@ -47,6 +48,7 @@
 		18C6967B8016DEFFEA826B15 /* ProtocolTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtocolTests.swift; sourceTree = "<group>"; };
 		29917680368CB19BC1A5838B /* OneClickSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneClickSheet.swift; sourceTree = "<group>"; };
 		3715B603C3FA2E6C21336EC5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		38F83F428C26181967836A15 /* LegacyInclusionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyInclusionUITests.swift; sourceTree = "<group>"; };
 		52053EE328F00BA021F875CE /* TuningUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuningUITests.swift; sourceTree = "<group>"; };
 		5BE4C8390FC11E2D22EB5650 /* VOFA2RemoteTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VOFA2RemoteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		61DB5DF5C7FE9E72537A707F /* RemoteClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteClientTests.swift; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 		77593DA0F7DF73A3A3506F8E /* VOFA2RemoteUITests */ = {
 			isa = PBXGroup;
 			children = (
+				38F83F428C26181967836A15 /* LegacyInclusionUITests.swift */,
 				8A7778D4D1F0C467FA582E47 /* OneClickOfflineUITests.swift */,
 				D22B20567213DE4575415EA3 /* PinFlowUITests.swift */,
 				52053EE328F00BA021F875CE /* TuningUITests.swift */,
@@ -283,6 +286,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AF1C2C2519407B9F71A2C287 /* LegacyInclusionUITests.swift in Sources */,
 				ED0A7C78531DF0EF276C3823 /* OneClickOfflineUITests.swift in Sources */,
 				9EFD012B3AAC44B7DBCD7D3C /* PinFlowUITests.swift in Sources */,
 				9CF42513E27FB9A20953A50D /* TuningUITests.swift in Sources */,

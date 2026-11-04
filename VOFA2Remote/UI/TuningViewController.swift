@@ -30,6 +30,8 @@ final class TuningViewController: UIViewController {
 
     /// The "一键发送数据" panel, kept so progress can be pushed into it.
     private weak var oneClickSheet: OneClickSheetViewController?
+    /// Flipped to false when the PC answers `bad_request` for `{"t":"inc"}`.
+    private var inclusionWritesSupported = true
     /// Local fallback send used when the selection differs from the PC plan.
     private var localTimer: DispatchSourceTimer?
     private var localPlan: [ControlItem] = []
@@ -396,6 +398,12 @@ final class TuningViewController: UIViewController {
         updateStatusUI()
         updateOneClickUI(snapshot.oneClick)
         oneClickSheet?.setPCConnected(snapshot.conn.isConnected)
+        if let sheet = oneClickSheet, let group = currentGroupIfAvailable {
+            let map = Dictionary(uniqueKeysWithValues: snapshot
+                .controls(inGroup: group)
+                .map { ($0.id, $0.includedInOneClick) })
+            sheet.applyPCState(map)
+        }
     }
 
     private func applyValue(id: Int, value: Double, from: String?) {
@@ -509,6 +517,15 @@ final class TuningViewController: UIViewController {
             failOneClick(message: message.isEmpty ? "PC 未连接设备，先连接再发送" : message)
         case "bad_value":
             showPeerHint("数值不合法，已回退")
+        case "bad_request":
+            if message.contains("inc") || message.contains("未知消息类型") {
+                // 旧版服务端不认识 {"t":"inc"}：退化成「只对本次发送生效」。
+                inclusionWritesSupported = false
+                oneClickSheet?.setInclusionSupported(false)
+                showPeerHint("这台 PC 不支持写回勾选，选择只在本次生效")
+            } else if !message.isEmpty {
+                showPeerHint(message)
+            }
         case "unknown_control", "unknown_group":
             showPeerHint("控件已被 PC 修改，正在刷新")
         case "unsupported":
@@ -748,6 +765,10 @@ final class TuningViewController: UIViewController {
         sheet.onStop = { [weak self] in
             self?.stopOneClick()
         }
+        sheet.onToggleInclusion = { [weak self] id, included in
+            self?.client.setIncluded(id: id, included: included)
+        }
+        sheet.setInclusionSupported(inclusionWritesSupported)
         sheet.onClose = { [weak self] in
             self?.oneClickSheet = nil
         }

@@ -254,7 +254,7 @@ class Client:
 
 
 class Server:
-    def __init__(self, model, port, discovery_port, verbose=True):
+    def __init__(self, model, port, discovery_port, verbose=True, legacy=False):
         self.model = model
         self.port = port
         self.discovery_port = discovery_port
@@ -263,6 +263,8 @@ class Server:
         self.verbose = verbose
         self.sessions = 0
         self.running = True
+        # Reject `{"t":"inc"}` like a PC build that predates the message.
+        self.legacy = legacy
 
     def log(self, text):
         if self.verbose:
@@ -497,6 +499,26 @@ class Server:
                                 "on": False, "from": origin, "flash": True})
                 self.log(f"button {action.label} triggered by {origin}")
 
+        elif kind == "inc":
+            cid = message.get("id")
+            control = model.control(cid) if isinstance(cid, int) else None
+            if control is None:
+                client.send_json({"t": "error", "code": "unknown_control", "message": "控件不存在"})
+                return
+            if self.legacy:
+                # Older PC builds do not know this message at all.
+                client.send_json({"t": "error", "code": "bad_request",
+                                  "message": "未知消息类型：inc"})
+                return
+            flag = message.get("inc")
+            if not isinstance(flag, bool):
+                client.send_json({"t": "error", "code": "bad_request", "message": "inc 必须是布尔值"})
+                return
+            with model.lock:
+                control.inc = flag
+            self.log(f"inc {control.label} -> {flag}")
+            self.broadcast(model.state_payload())
+
         elif kind == "oneclick":
             self.start_oneclick(client, message)
 
@@ -614,6 +636,8 @@ def main():
     parser.add_argument("--wiggle", action="store_true", help="simulate PC-side value edits")
     parser.add_argument("--offline", action="store_true",
                         help="simulate a PC that is not connected to a board")
+    parser.add_argument("--legacy", action="store_true",
+                        help="reject {\"t\":\"inc\"} like an old PC build")
     parser.add_argument("--quiet", action="store_true")
     args = parser.parse_args()
 
@@ -624,10 +648,11 @@ def main():
     if args.offline:
         model.conn_connected = False
         model.conn_text = "未连接"
-    server = Server(model, args.port, args.discovery_port, verbose=not args.quiet)
+    server = Server(model, args.port, args.discovery_port, verbose=not args.quiet,
+                    legacy=args.legacy)
     print(f"mock server '{args.name}' control={args.port} discovery={args.discovery_port} "
-          f"pin={'yes' if args.pin else 'no'} conn={'offline' if args.offline else 'online'}",
-          flush=True)
+          f"pin={'yes' if args.pin else 'no'} conn={'offline' if args.offline else 'online'} "
+          f"inc={'legacy' if args.legacy else 'supported'}", flush=True)
     try:
         server.serve()
     except KeyboardInterrupt:

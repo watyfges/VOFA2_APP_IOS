@@ -87,8 +87,9 @@ final class TuningUITests: XCTestCase {
         // The PC-style sheet, pre-filled from the PC's `inc` ticks.
         let sendButton = app.buttons["oneclick.sheet.send"]
         XCTAssertTrue(sendButton.waitForExistence(timeout: 5), "one-click sheet should open")
-        XCTAssertTrue(app.staticTexts["oneclick.sheet.count"].label.contains("已选 3 项"),
-                      "默认组三个滑块在 PC 上都被勾选")
+        // 勾选是 PC 的持久状态，其它用例可能改过；先全选再断言。
+        app.buttons["oneclick.sheet.selectAll"].tap()
+        XCTAssertTrue(app.staticTexts["oneclick.sheet.count"].label.contains("已选 3 项"))
         sendButton.tap()
 
         let status = app.staticTexts["oneclick.sheet.status"]
@@ -122,6 +123,46 @@ final class TuningUITests: XCTestCase {
         let status = app.staticTexts["oneclick.sheet.status"]
         expectation(for: NSPredicate(format: "label CONTAINS %@", "完成 1 项"), evaluatedWith: status)
         waitForExpectations(timeout: 10)
+
+        // 勾选会写回 PC，收尾时恢复成全选，避免影响其它用例。
+        app.buttons["oneclick.sheet.selectAll"].tap()
+        app.buttons["oneclick.sheet.close"].tap()
+    }
+
+    /// 勾选改动要写回 PC（`{"t":"inc"}`），主界面的「一键」标签随之变化。
+    /// 勾选是 PC 的持久状态，所以用例先读当前状态，翻转一次再翻回去。
+    func testTogglingCheckboxWritesBackToPC() {
+        let link = app.staticTexts["status.link"]
+        XCTAssertTrue(link.waitForExistence(timeout: 15))
+        expectation(for: NSPredicate(format: "label == %@", "已连接"), evaluatedWith: link)
+        waitForExpectations(timeout: 15)
+
+        app.buttons["group.chip.默认"].tap()
+        let tag = app.staticTexts["control.oneclick.kp"]
+        _ = tag.waitForExistence(timeout: 5)
+        let startedIncluded = tag.exists
+
+        // 翻转一次：取消勾选 -> 写回 PC -> state 回传后标签消失
+        app.buttons["oneclick.button"].tap()
+        let row = app.cells["oneclick.sheet.item.kp"].firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        row.tap()
+        app.buttons["oneclick.sheet.close"].tap()
+
+        let afterToggle = startedIncluded ? "exists == false" : "exists == true"
+        expectation(for: NSPredicate(format: afterToggle), evaluatedWith: tag)
+        waitForExpectations(timeout: 8)
+
+        // 再翻回去，保持 PC 的初始勾选。
+        app.buttons["oneclick.button"].tap()
+        let rowAgain = app.cells["oneclick.sheet.item.kp"].firstMatch
+        XCTAssertTrue(rowAgain.waitForExistence(timeout: 5))
+        rowAgain.tap()
+        app.buttons["oneclick.sheet.close"].tap()
+
+        let restored = startedIncluded ? "exists == true" : "exists == false"
+        expectation(for: NSPredicate(format: restored), evaluatedWith: tag)
+        waitForExpectations(timeout: 8)
     }
 
     func testSwitchingGroupsChangesVisibleControls() {

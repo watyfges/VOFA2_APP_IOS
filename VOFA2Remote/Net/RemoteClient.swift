@@ -406,6 +406,14 @@ final class RemoteClient {
         }
     }
 
+    /// Writes 「参与一键发送数据」 back to the PC. Older servers answer
+    /// `bad_request` ("未知消息类型"), which the UI turns into local-only mode.
+    func setIncluded(id: Int, included: Bool) {
+        queue.async { [weak self] in
+            self?.send(OutboundMessage.inclusion(id: id, included: included))
+        }
+    }
+
     func requestSync() {
         queue.async { [weak self] in
             self?.send(OutboundMessage.sync())

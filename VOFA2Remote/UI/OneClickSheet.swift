@@ -29,6 +29,8 @@ final class OneClickSheetViewController: UIViewController {
     var onSend: (([Int], Int) -> Void)?
     var onStop: (() -> Void)?
     var onClose: (() -> Void)?
+    /// Fired when a checkbox is toggled and the server supports writing `inc`.
+    var onToggleInclusion: ((Int, Bool) -> Void)?
 
     private let tableView = UITableView(frame: .zero, style: .plain)
     private let countLabel = UILabel()
@@ -40,15 +42,22 @@ final class OneClickSheetViewController: UIViewController {
     private let selectAllButton = UIButton(type: .system)
     private let selectNoneButton = UIButton(type: .system)
     private let warningLabel = UILabel()
+    private let hintLabel = UILabel()
     private var isSending = false
     /// Whether the PC says it is connected to a board / a TCP peer.
     private var pcConnected: Bool
+    /// `inc` per control id, kept in sync with the PC when it supports writes.
+    private var pcIncluded: [Int: Bool]
+    /// Old servers answer `bad_request` for `{"t":"inc"}`, so fall back to a
+    /// selection that only applies to this send.
+    private var inclusionWritesSupported = true
 
     init(groupName: String, rows: [Row], intervalMs: Int, pcConnected: Bool) {
         self.groupName = groupName
         self.rows = rows
         self.intervalMs = max(10, min(5000, intervalMs))
         self.pcConnected = pcConnected
+        self.pcIncluded = Dictionary(uniqueKeysWithValues: rows.map { ($0.id, $0.pcIncluded) })
         self.selected = Set(rows.filter { $0.pcIncluded }.map { $0.id })
         super.init(nibName: nil, bundle: nil)
     }
@@ -170,11 +179,11 @@ final class OneClickSheetViewController: UIViewController {
         intervalRow.spacing = 6
         intervalRow.alignment = .center
 
-        let hint = UILabel()
-        hint.text = "勾选只对本次发送有效；PC 上勾选了「参与一键发送数据」的滑块默认已选。"
-        hint.font = .preferredFont(forTextStyle: .caption2)
-        hint.textColor = .tertiaryLabel
-        hint.numberOfLines = 0
+        hintLabel.font = .preferredFont(forTextStyle: .caption2)
+        hintLabel.textColor = .tertiaryLabel
+        hintLabel.numberOfLines = 0
+        hintLabel.accessibilityIdentifier = "oneclick.sheet.hint"
+        updateHint()
 
         warningLabel.text = "PC 还没有连接设备，发送会失败；请先在 PC 上连接串口/TCP。"
         warningLabel.font = .preferredFont(forTextStyle: .caption1)
@@ -225,7 +234,7 @@ final class OneClickSheetViewController: UIViewController {
         filler.setContentHuggingPriority(.defaultLow, for: .vertical)
 
         let stack = UIStackView(arrangedSubviews: [
-            titleRow, subtitle, toolsRow, tableView, intervalRow, hint, warningLabel,
+            titleRow, subtitle, toolsRow, tableView, intervalRow, hintLabel, warningLabel,
             filler, progressView, statusLabel, buttonsRow
         ])
         stack.axis = .vertical
@@ -258,13 +267,42 @@ final class OneClickSheetViewController: UIViewController {
     @objc private func selectAllTapped() {
         guard !isSending else { return }
         selected = Set(rows.map { $0.id })
+        for row in rows where pcIncluded[row.id] != true {
+            pcIncluded[row.id] = true
+            if inclusionWritesSupported { onToggleInclusion?(row.id, true) }
+        }
         updateCount()
     }
 
     @objc private func selectNoneTapped() {
         guard !isSending else { return }
         selected.removeAll()
+        for row in rows where pcIncluded[row.id] != false {
+            pcIncluded[row.id] = false
+            if inclusionWritesSupported { onToggleInclusion?(row.id, false) }
+        }
         updateCount()
+    }
+
+    /// Switches between "writes back to the PC" and "this send only".
+    func setInclusionSupported(_ supported: Bool) {
+        guard inclusionWritesSupported != supported else { return }
+        inclusionWritesSupported = supported
+        updateHint()
+    }
+
+    /// Mirrors `state.controls[].inc` after the server accepted a write.
+    func applyPCState(_ map: [Int: Bool]) {
+        guard inclusionWritesSupported, !isSending, !map.isEmpty else { return }
+        pcIncluded = map
+        selected = Set(map.filter { $0.value }.map { $0.key })
+        updateCount()
+    }
+
+    private func updateHint() {
+        hintLabel.text = inclusionWritesSupported
+            ? "勾选会写回 PC 的「参与一键发送数据」，对之后的一键发送都有效。"
+            : "这台 PC 不支持写回勾选，本次选择只在这一次发送里生效。"
     }
 
     // MARK: - Sending
@@ -350,9 +388,10 @@ extension OneClickSheetViewController: UITableViewDataSource, UITableViewDelegat
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier)
             ?? UITableViewCell(style: .subtitle, reuseIdentifier: identifier)
         let row = rows[indexPath.row]
+        let includedOnPC = pcIncluded[row.id] ?? row.pcIncluded
         cell.textLabel?.text = row.label
         cell.textLabel?.font = .preferredFont(forTextStyle: .body)
-        cell.detailTextLabel?.text = row.pcIncluded ? "\(row.valueText) · PC 已勾选" : row.valueText
+        cell.detailTextLabel?.text = includedOnPC ? "\(row.valueText) · PC 已勾选" : row.valueText
         cell.detailTextLabel?.font = Theme.monoFont(ofSize: 12)
         cell.detailTextLabel?.textColor = .secondaryLabel
         cell.accessoryType = selected.contains(row.id) ? .checkmark : .none
@@ -369,10 +408,16 @@ extension OneClickSheetViewController: UITableViewDataSource, UITableViewDelegat
         tableView.deselectRow(at: indexPath, animated: true)
         guard !isSending else { return }
         let row = rows[indexPath.row]
-        if selected.contains(row.id) {
-            selected.remove(row.id)
-        } else {
+        let included = !selected.contains(row.id)
+        if included {
             selected.insert(row.id)
+        } else {
+            selected.remove(row.id)
+        }
+        pcIncluded[row.id] = included
+        // The PC owns the checkbox; older servers reject the write and we stay local.
+        if inclusionWritesSupported {
+            onToggleInclusion?(row.id, included)
         }
         updateCount()
     }

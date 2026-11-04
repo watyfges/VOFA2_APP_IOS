@@ -237,6 +237,11 @@ enum OutboundMessage {
         encode(["t": "oneclick.stop"])
     }
 
+    /// Toggles 「参与一键发送数据」 on the PC (`controls[].inc`).
+    static func inclusion(id: Int, included: Bool) -> String {
+        encode(["t": "inc", "id": id, "inc": included])
+    }
+
     static func sync() -> String { "{\"t\":\"sync\"}" }
     static func ping() -> String { "{\"t\":\"ping\"}" }
 

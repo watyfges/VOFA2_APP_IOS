@@ -153,8 +153,48 @@ final class RemoteClientTests: XCTestCase {
         client.disconnect()
     }
 
-    // MARK: - Access code
+    // MARK: - 参与一键发送（inc）
 
+    func testInclusionWriteIsEchoedInState() throws {
+        try XCTSkipUnless(mockServerReachable(), "mock server not running on 127.0.0.1:\(port)")
+
+        let client = makeClient()
+        var latest: RemoteSnapshot?
+        let firstState = expectation(description: "first state")
+        let toggled = expectation(description: "state after inc")
+        toggled.assertForOverFulfill = false
+        var waitingForToggle = false
+        var expectedInclusion = false
+
+        client.onEvent = { event in
+            guard case .snapshot(let snapshot) = event else { return }
+            latest = snapshot
+            if !waitingForToggle {
+                firstState.fulfill()
+                return
+            }
+            if let control = snapshot.control(id: 1000),
+               control.includedInOneClick == expectedInclusion {
+                toggled.fulfill()
+            }
+        }
+
+        client.connect()
+        wait(for: [firstState], timeout: 10)
+
+        // Toggle to the opposite of whatever the mock currently has, then put it back.
+        let initial = latest?.control(id: 1000)?.includedInOneClick ?? true
+        expectedInclusion = !initial
+        waitingForToggle = true
+        client.setIncluded(id: 1000, included: expectedInclusion)
+        wait(for: [toggled], timeout: 10)
+        XCTAssertEqual(latest?.control(id: 1000)?.includedInOneClick, expectedInclusion)
+
+        client.setIncluded(id: 1000, included: initial)
+        client.disconnect()
+    }
+
+    // MARK: - Access code
     private let pinPort = 47910
 
     func testWrongPinIsRejectedWith4003() throws {
