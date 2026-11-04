@@ -85,12 +85,14 @@ mkdir -p /tmp/vofa/Payload && cp -R "$APP" /tmp/vofa/Payload/
 
 ## 测试
 
-先起 PC 端模拟器（两路，其中一路带访问码）：
+先起 PC 端模拟器（三路：普通、带访问码、PC 未连设备）：
 
 ```bash
 python3 tools/mock_remote_server.py --port 47900 --name "调试台 A" &
 python3 tools/mock_remote_server.py --port 47910 --discovery-port 47911 \
         --name "调试台 PIN" --pin 1234 &
+python3 tools/mock_remote_server.py --port 47920 --discovery-port 47921 \
+        --name "调试台 离线" --offline &
 ```
 
 ```bash
@@ -99,7 +101,7 @@ xcodebuild -project VOFA2Remote.xcodeproj -scheme VOFA2Remote \
   -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 14' \
   test -only-testing:VOFA2RemoteTests
 
-# UI 自动化（5 项，含 PIN 重输）
+# UI 自动化（8 项：连接、滑块、开关、一键发送、访问码、离线拒发）
 xcodebuild ... test -only-testing:VOFA2RemoteUITests
 ```
 
@@ -121,8 +123,10 @@ xcodebuild ... test -only-testing:VOFA2RemoteUITests
 | 按钮 300 ms 防抖，收到 `flash` 做点击动效 | `CommandButtonCell` |
 | 自己写入的回声不打断正在拖的滑块 | `ControlCell.applyEcho` + `isDragging` |
 | 一键发送 | 点按钮弹出「一键发送数据」面板：勾选滑块、全选/全不选、改间隔、看进度、可取消（`OneClickSheet`） |
-| 一键发送的两条路径 | 选中项 == PC 勾选的 `inc` 集合时走服务端 `oneclick`（互斥、PC 也显示进度）；否则按勾选逐条 `commit` | `startOneClick` |
-| `busy` / `empty_plan` / `unknown_*` / `bad_value` 提示与刷新 | `handleServerError` |
+| 一键发送的两条路径 | 选中项 == PC 勾选的 `inc` 集合时走服务端 `oneclick`（互斥、PC 也显示进度）；否则按勾选逐条 `commit`（`startOneClick`） |
+| PC 未连设备时一键发送 | 服务端回 `not_connected` 并广播 `phase=idle`，App 显示原因并解锁按钮；自定义勾选走本地逐条 `commit`，发送前自查 `conn.connected`（`failOneClick`） |
+| 发送中途断开 | 服务端发 `phase=cancel`（"已中断：连接已断开"）；本地计划遇到 `conn.connected=false` 也会中止（`applyConn`） |
+| `busy` / `empty_plan` / `not_connected` / `unknown_*` / `bad_value` 提示与刷新 | `handleServerError` |
 | 45 s 静默判定掉线，20 s 主动 `ping` | watchdog + heartbeat |
 | 重连退避 1 s→2 s→5 s，最多 5 次；4001 不自动重连 | `scheduleReconnect` |
 | 4003 访问码错误 → 弹窗重输后重连 | `promptForPin` |
@@ -139,5 +143,7 @@ xcodebuild ... test -only-testing:VOFA2RemoteUITests
   （滑块行上的「一键」标签是 PC 当前勾选状态的只读提示）。
 - 勾选与 PC 计划不一致时走本地逐条 `commit`：下发效果与 PC 一键发送一致（同一套下发函数），
   但 PC 端不显示这次进度，也不占用服务端的「一键发送互斥」。
+- PC 未连接设备时面板会显示橙色提示；两种发送路径都会被拒绝（服务端 `not_connected`，
+  或本地自查 `conn.connected`），不会出现「发送中」卡死。
 - iOS 的 WebSocket 由系统库负责回 pong；仍保留 20 s 应用层 `ping` 作为双保险。
 - 首次启动会弹「本地网络」权限，拒绝后只能手动输入 IP 且连接会失败，需到系统设置里重新打开。

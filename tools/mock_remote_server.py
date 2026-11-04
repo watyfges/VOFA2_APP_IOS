@@ -528,14 +528,31 @@ class Server:
             if model.oneclick["sending"]:
                 client.send_json({"t": "error", "code": "busy", "message": "正在一键发送"})
                 return
-            plan = sorted([c for c in model.controls if c.group == group and c.inc],
-                          key=lambda c: c.order)
-            if not plan:
-                client.send_json({"t": "error", "code": "empty_plan", "message": "该组没有可发送的滑块"})
-                return
-            interval = min(max(int(message.get("intervalMs") or 100), 10), 5000)
-            model.oneclick.update({"sending": True, "sent": 0, "total": len(plan),
-                                   "status": "", "interval": interval})
+            if not model.conn_connected:
+                # Mirrors the PC: no transport means the run is refused before a
+                # plan is even built, and `phase=idle` unlocks the phone.
+                offline_status = "未连接：请先连接设备再一键发送"
+                model.oneclick.update({"sending": False, "sent": 0, "total": 0,
+                                       "status": offline_status})
+                plan = None
+                interval = 0
+            else:
+                plan = sorted([c for c in model.controls if c.group == group and c.inc],
+                              key=lambda c: c.order)
+                if not plan:
+                    client.send_json({"t": "error", "code": "empty_plan", "message": "该组没有可发送的滑块"})
+                    return
+                interval = min(max(int(message.get("intervalMs") or 100), 10), 5000)
+                model.oneclick.update({"sending": True, "sent": 0, "total": len(plan),
+                                       "status": "", "interval": interval})
+
+        if plan is None:
+            self.broadcast({"t": "oneclick", "phase": "idle", "sent": 0, "total": 0,
+                            "status": offline_status})
+            client.send_json({"t": "error", "code": "not_connected", "message": offline_status})
+            self.log("oneclick refused: not_connected")
+            return
+
         self.log(f"oneclick group={group} plan={len(plan)} interval={interval}")
 
         self.broadcast({"t": "oneclick", "phase": "start", "sent": 0,
@@ -595,6 +612,8 @@ def main():
     parser.add_argument("--name", default="调试台 (mock)")
     parser.add_argument("--pin", default="")
     parser.add_argument("--wiggle", action="store_true", help="simulate PC-side value edits")
+    parser.add_argument("--offline", action="store_true",
+                        help="simulate a PC that is not connected to a board")
     parser.add_argument("--quiet", action="store_true")
     args = parser.parse_args()
 
@@ -602,9 +621,13 @@ def main():
         os.environ["VOFA_MOCK_WIGGLE"] = "1"
 
     model = Model(args.name, bool(args.pin), args.pin)
+    if args.offline:
+        model.conn_connected = False
+        model.conn_text = "未连接"
     server = Server(model, args.port, args.discovery_port, verbose=not args.quiet)
     print(f"mock server '{args.name}' control={args.port} discovery={args.discovery_port} "
-          f"pin={'yes' if args.pin else 'no'}", flush=True)
+          f"pin={'yes' if args.pin else 'no'} conn={'offline' if args.offline else 'online'}",
+          flush=True)
     try:
         server.serve()
     except KeyboardInterrupt:

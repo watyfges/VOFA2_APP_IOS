@@ -22,6 +22,7 @@
 		B90552F5C032154DBD8018F1 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8284CD5550D788B391AD9290 /* Theme.swift */; };
 		D7F2BAEA38548F5EA756FFC1 /* RemoteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95DA4BF33D852912260592B /* RemoteMessage.swift */; };
 		E1E37B834F2E2D3DC92BB0BA /* TuningViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00EC8868BAA443CEDD56F6EC /* TuningViewController.swift */; };
+		ED0A7C78531DF0EF276C3823 /* OneClickOfflineUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A7778D4D1F0C467FA582E47 /* OneClickOfflineUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +54,7 @@
 		7C9A2CF8F31E187EE6510CB3 /* RemoteClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteClient.swift; sourceTree = "<group>"; };
 		81462C666860EAF95B81E577 /* ControlCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlCells.swift; sourceTree = "<group>"; };
 		8284CD5550D788B391AD9290 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		8A7778D4D1F0C467FA582E47 /* OneClickOfflineUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneClickOfflineUITests.swift; sourceTree = "<group>"; };
 		8D255E79B58B94153925A23C /* RemoteModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteModels.swift; sourceTree = "<group>"; };
 		9E853A4B897636BB2DF43AE0 /* VOFA2RemoteUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VOFA2RemoteUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B3F96635AEF1AA2F43440429 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -104,6 +106,7 @@
 		77593DA0F7DF73A3A3506F8E /* VOFA2RemoteUITests */ = {
 			isa = PBXGroup;
 			children = (
+				8A7778D4D1F0C467FA582E47 /* OneClickOfflineUITests.swift */,
 				D22B20567213DE4575415EA3 /* PinFlowUITests.swift */,
 				52053EE328F00BA021F875CE /* TuningUITests.swift */,
 			);
@@ -280,6 +283,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ED0A7C78531DF0EF276C3823 /* OneClickOfflineUITests.swift in Sources */,
 				9EFD012B3AAC44B7DBCD7D3C /* PinFlowUITests.swift in Sources */,
 				9CF42513E27FB9A20953A50D /* TuningUITests.swift in Sources */,
 			);

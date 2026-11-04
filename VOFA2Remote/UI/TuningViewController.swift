@@ -395,6 +395,7 @@ final class TuningViewController: UIViewController {
         reloadSections()
         updateStatusUI()
         updateOneClickUI(snapshot.oneClick)
+        oneClickSheet?.setPCConnected(snapshot.conn.isConnected)
     }
 
     private func applyValue(id: Int, value: Double, from: String?) {
@@ -472,17 +473,19 @@ final class TuningViewController: UIViewController {
     }
 
     private func applyConn(_ conn: ConnState) {
-        guard var snapshot = snapshot else {
-            connLabel.isHidden = conn.isConnected
-            connLabel.text = "PC 未连接板子 · 数据发不出去"
-            return
+        if var snapshot = snapshot {
+            snapshot.conn = conn
+            self.snapshot = snapshot
         }
-        snapshot.conn = conn
-        self.snapshot = snapshot
         connLabel.isHidden = conn.isConnected
         connLabel.text = conn.isConnected
             ? nil
             : "PC 未连接板子（\(conn.text.isEmpty ? "离线" : conn.text)）· 操作会被记录但发不出去"
+
+        oneClickSheet?.setPCConnected(conn.isConnected)
+        if !conn.isConnected, localTimer != nil {
+            failOneClick(message: "已中断：连接已断开")
+        }
     }
 
     private func handleServerError(code: String, message: String) {
@@ -500,6 +503,10 @@ final class TuningViewController: UIViewController {
             progressLabel.text = "该组没有勾选「一键发送」的滑块"
             showPeerHint("该命令组没有可发送的滑块")
             scheduleProgressHide()
+        case "not_connected":
+            // PC 端没有串口/TCP 对端：一键发送一步都不会走，服务端已同时广播
+            // phase=idle 解锁按钮，这里把原因显示出来。
+            failOneClick(message: message.isEmpty ? "PC 未连接设备，先连接再发送" : message)
         case "bad_value":
             showPeerHint("数值不合法，已回退")
         case "unknown_control", "unknown_group":
@@ -733,7 +740,8 @@ final class TuningViewController: UIViewController {
         }
         let sheet = OneClickSheetViewController(groupName: group,
                                                 rows: rows,
-                                                intervalMs: snapshot.oneClick.intervalMs)
+                                                intervalMs: snapshot.oneClick.intervalMs,
+                                                pcConnected: snapshot.conn.isConnected)
         sheet.onSend = { [weak self] ids, intervalMs in
             self?.startOneClick(ids: ids, intervalMs: intervalMs)
         }
@@ -757,11 +765,31 @@ final class TuningViewController: UIViewController {
         guard !chosen.isEmpty else { return }
 
         if chosen.map({ $0.id }) == pcPlan {
+            // The server refuses on its own (and broadcasts phase=idle + the
+            // `not_connected` error) when it has no board or TCP peer.
             setSending(true)
             client.startOneClick(group: group, intervalMs: intervalMs)
         } else {
+            // A local plan never reaches the server's one-click guard, so check
+            // the link ourselves: commits would be dropped on the PC side.
+            guard snapshot.conn.isConnected else {
+                failOneClick(message: "PC 未连接设备，先连接再发送")
+                return
+            }
             runLocalOneClick(chosen, intervalMs: intervalMs)
         }
+    }
+
+    /// Stops whatever is running and reports why, unlocking both UIs.
+    private func failOneClick(message: String) {
+        stopLocalTimer()
+        setSending(false)
+        progressView.progress = 0
+        progressLabel.isHidden = false
+        progressLabel.text = message
+        oneClickSheet?.updateProgress(sent: 0, total: 0, status: message, sending: false)
+        showPeerHint(message)
+        scheduleProgressHide()
     }
 
     private func runLocalOneClick(_ items: [ControlItem], intervalMs: Int) {

@@ -39,12 +39,16 @@ final class OneClickSheetViewController: UIViewController {
     private let stopButton = UIButton(type: .system)
     private let selectAllButton = UIButton(type: .system)
     private let selectNoneButton = UIButton(type: .system)
+    private let warningLabel = UILabel()
     private var isSending = false
+    /// Whether the PC says it is connected to a board / a TCP peer.
+    private var pcConnected: Bool
 
-    init(groupName: String, rows: [Row], intervalMs: Int) {
+    init(groupName: String, rows: [Row], intervalMs: Int, pcConnected: Bool) {
         self.groupName = groupName
         self.rows = rows
         self.intervalMs = max(10, min(5000, intervalMs))
+        self.pcConnected = pcConnected
         self.selected = Set(rows.filter { $0.pcIncluded }.map { $0.id })
         super.init(nibName: nil, bundle: nil)
     }
@@ -172,6 +176,13 @@ final class OneClickSheetViewController: UIViewController {
         hint.textColor = .tertiaryLabel
         hint.numberOfLines = 0
 
+        warningLabel.text = "PC 还没有连接设备，发送会失败；请先在 PC 上连接串口/TCP。"
+        warningLabel.font = .preferredFont(forTextStyle: .caption1)
+        warningLabel.textColor = Theme.warning
+        warningLabel.numberOfLines = 0
+        warningLabel.isHidden = pcConnected
+        warningLabel.accessibilityIdentifier = "oneclick.sheet.warning"
+
         progressView.progressTintColor = Theme.accent
         progressView.trackTintColor = .tertiarySystemFill
         progressView.isHidden = true
@@ -214,7 +225,7 @@ final class OneClickSheetViewController: UIViewController {
         filler.setContentHuggingPriority(.defaultLow, for: .vertical)
 
         let stack = UIStackView(arrangedSubviews: [
-            titleRow, subtitle, toolsRow, tableView, intervalRow, hint,
+            titleRow, subtitle, toolsRow, tableView, intervalRow, hint, warningLabel,
             filler, progressView, statusLabel, buttonsRow
         ])
         stack.axis = .vertical
@@ -302,6 +313,13 @@ final class OneClickSheetViewController: UIViewController {
         sendButton.alpha = enabled ? 1 : 0.5
         stopButton.isEnabled = !enabled
         stopButton.alpha = enabled ? 0.4 : 1
+    }
+
+    /// Called when a `conn` update arrives while the sheet is open.
+    func setPCConnected(_ connected: Bool) {
+        guard pcConnected != connected else { return }
+        pcConnected = connected
+        warningLabel.isHidden = connected
     }
 
     /// Called by the tuning screen for both the server-driven and the local plan.
