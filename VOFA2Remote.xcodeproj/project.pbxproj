@@ -1,0 +1,473 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		008C984ACB89E58ADD842DAC /* RemoteClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C9A2CF8F31E187EE6510CB3 /* RemoteClient.swift */; };
+		3A9613429857D9FCFC1665BD /* DiscoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78E5FCFDE83519A015A83AD5 /* DiscoveryService.swift */; };
+		4F165B54337989BE2DF8FDEA /* RemoteClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61DB5DF5C7FE9E72537A707F /* RemoteClientTests.swift */; };
+		5613496331BA4334857CC283 /* ProtocolTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C6967B8016DEFFEA826B15 /* ProtocolTests.swift */; };
+		5B37903291CD62F362ACF4EF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B3F96635AEF1AA2F43440429 /* Assets.xcassets */; };
+		5E9118994DB71E2B66660271 /* RemoteModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D255E79B58B94153925A23C /* RemoteModels.swift */; };
+		6329A795D3A778726BD5BE83 /* ControlCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81462C666860EAF95B81E577 /* ControlCells.swift */; };
+		758DFB3324330451BEC214B8 /* ServerListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C670CCA0026A724AF90BF6F8 /* ServerListViewController.swift */; };
+		9CF42513E27FB9A20953A50D /* TuningUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52053EE328F00BA021F875CE /* TuningUITests.swift */; };
+		9EFD012B3AAC44B7DBCD7D3C /* PinFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22B20567213DE4575415EA3 /* PinFlowUITests.swift */; };
+		B1A507CDD94B76031491DB84 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3715B603C3FA2E6C21336EC5 /* AppDelegate.swift */; };
+		B90552F5C032154DBD8018F1 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8284CD5550D788B391AD9290 /* Theme.swift */; };
+		D7F2BAEA38548F5EA756FFC1 /* RemoteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95DA4BF33D852912260592B /* RemoteMessage.swift */; };
+		E1E37B834F2E2D3DC92BB0BA /* TuningViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00EC8868BAA443CEDD56F6EC /* TuningViewController.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CE88C4D4F71039E734EE83CE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6F34EAE5E7E7B8D3C2BB711D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 795B6C77A56A069A0C848BD2;
+			remoteInfo = VOFA2Remote;
+		};
+		F1704159EBA9DA5730950AC1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6F34EAE5E7E7B8D3C2BB711D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 795B6C77A56A069A0C848BD2;
+			remoteInfo = VOFA2Remote;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		00EC8868BAA443CEDD56F6EC /* TuningViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuningViewController.swift; sourceTree = "<group>"; };
+		18C6967B8016DEFFEA826B15 /* ProtocolTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtocolTests.swift; sourceTree = "<group>"; };
+		3715B603C3FA2E6C21336EC5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		52053EE328F00BA021F875CE /* TuningUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuningUITests.swift; sourceTree = "<group>"; };
+		5BE4C8390FC11E2D22EB5650 /* VOFA2RemoteTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VOFA2RemoteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		61DB5DF5C7FE9E72537A707F /* RemoteClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteClientTests.swift; sourceTree = "<group>"; };
+		78E5FCFDE83519A015A83AD5 /* DiscoveryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryService.swift; sourceTree = "<group>"; };
+		7C9A2CF8F31E187EE6510CB3 /* RemoteClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteClient.swift; sourceTree = "<group>"; };
+		81462C666860EAF95B81E577 /* ControlCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlCells.swift; sourceTree = "<group>"; };
+		8284CD5550D788B391AD9290 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		8D255E79B58B94153925A23C /* RemoteModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteModels.swift; sourceTree = "<group>"; };
+		9E853A4B897636BB2DF43AE0 /* VOFA2RemoteUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VOFA2RemoteUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B3F96635AEF1AA2F43440429 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BE3D2615B1728C14013221AF /* VOFA2Remote.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = VOFA2Remote.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C670CCA0026A724AF90BF6F8 /* ServerListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerListViewController.swift; sourceTree = "<group>"; };
+		D22B20567213DE4575415EA3 /* PinFlowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinFlowUITests.swift; sourceTree = "<group>"; };
+		D95DA4BF33D852912260592B /* RemoteMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessage.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		133DDE0BF0C7DE2AB76E6BEF /* VOFA2RemoteTests */ = {
+			isa = PBXGroup;
+			children = (
+				18C6967B8016DEFFEA826B15 /* ProtocolTests.swift */,
+				61DB5DF5C7FE9E72537A707F /* RemoteClientTests.swift */,
+			);
+			path = VOFA2RemoteTests;
+			sourceTree = "<group>";
+		};
+		301451DDE51A1293953296FA /* Net */ = {
+			isa = PBXGroup;
+			children = (
+				78E5FCFDE83519A015A83AD5 /* DiscoveryService.swift */,
+				7C9A2CF8F31E187EE6510CB3 /* RemoteClient.swift */,
+			);
+			path = Net;
+			sourceTree = "<group>";
+		};
+		64FFED412787765EE51C15D5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BE3D2615B1728C14013221AF /* VOFA2Remote.app */,
+				5BE4C8390FC11E2D22EB5650 /* VOFA2RemoteTests.xctest */,
+				9E853A4B897636BB2DF43AE0 /* VOFA2RemoteUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		751A4828CA3811C0849F0947 = {
+			isa = PBXGroup;
+			children = (
+				C76866B9A6049F95F227AB53 /* VOFA2Remote */,
+				133DDE0BF0C7DE2AB76E6BEF /* VOFA2RemoteTests */,
+				77593DA0F7DF73A3A3506F8E /* VOFA2RemoteUITests */,
+				64FFED412787765EE51C15D5 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		77593DA0F7DF73A3A3506F8E /* VOFA2RemoteUITests */ = {
+			isa = PBXGroup;
+			children = (
+				D22B20567213DE4575415EA3 /* PinFlowUITests.swift */,
+				52053EE328F00BA021F875CE /* TuningUITests.swift */,
+			);
+			path = VOFA2RemoteUITests;
+			sourceTree = "<group>";
+		};
+		C76866B9A6049F95F227AB53 /* VOFA2Remote */ = {
+			isa = PBXGroup;
+			children = (
+				E8137AC80B5A20BB633BE88A /* Model */,
+				301451DDE51A1293953296FA /* Net */,
+				E7D0DAA447F7EA3691BADFBF /* UI */,
+				B3F96635AEF1AA2F43440429 /* Assets.xcassets */,
+			);
+			path = VOFA2Remote;
+			sourceTree = "<group>";
+		};
+		E7D0DAA447F7EA3691BADFBF /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				3715B603C3FA2E6C21336EC5 /* AppDelegate.swift */,
+				81462C666860EAF95B81E577 /* ControlCells.swift */,
+				C670CCA0026A724AF90BF6F8 /* ServerListViewController.swift */,
+				8284CD5550D788B391AD9290 /* Theme.swift */,
+				00EC8868BAA443CEDD56F6EC /* TuningViewController.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		E8137AC80B5A20BB633BE88A /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				D95DA4BF33D852912260592B /* RemoteMessage.swift */,
+				8D255E79B58B94153925A23C /* RemoteModels.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		61985B1308E7EED06320694A /* VOFA2RemoteUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5978D992D1C3B199426343DF /* Build configuration list for PBXNativeTarget "VOFA2RemoteUITests" */;
+			buildPhases = (
+				CA7E4CDDDABC083FCCDE28D2 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				90979FAF0352EC6C9BD1138E /* PBXTargetDependency */,
+			);
+			name = VOFA2RemoteUITests;
+			packageProductDependencies = (
+			);
+			productName = VOFA2RemoteUITests;
+			productReference = 9E853A4B897636BB2DF43AE0 /* VOFA2RemoteUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		795B6C77A56A069A0C848BD2 /* VOFA2Remote */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F6533FBF2C816265BBE5BCBF /* Build configuration list for PBXNativeTarget "VOFA2Remote" */;
+			buildPhases = (
+				78CB5D0E17FCF58344828EF5 /* Sources */,
+				D420CEADA7D0FE90BC129E42 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = VOFA2Remote;
+			packageProductDependencies = (
+			);
+			productName = VOFA2Remote;
+			productReference = BE3D2615B1728C14013221AF /* VOFA2Remote.app */;
+			productType = "com.apple.product-type.application";
+		};
+		AC2B717CBA75DDFC8F048228 /* VOFA2RemoteTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9103FFBB1939349F9C51AEE2 /* Build configuration list for PBXNativeTarget "VOFA2RemoteTests" */;
+			buildPhases = (
+				0DB8B7975FF4E3014C361BE0 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F81CC6154827C53A8C92CBBE /* PBXTargetDependency */,
+			);
+			name = VOFA2RemoteTests;
+			packageProductDependencies = (
+			);
+			productName = VOFA2RemoteTests;
+			productReference = 5BE4C8390FC11E2D22EB5650 /* VOFA2RemoteTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6F34EAE5E7E7B8D3C2BB711D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					61985B1308E7EED06320694A = {
+						TestTargetID = 795B6C77A56A069A0C848BD2;
+					};
+					795B6C77A56A069A0C848BD2 = {
+						DevelopmentTeam = "";
+					};
+				};
+			};
+			buildConfigurationList = 000531F8628A547047888CB6 /* Build configuration list for PBXProject "VOFA2Remote" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 751A4828CA3811C0849F0947;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 64FFED412787765EE51C15D5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				795B6C77A56A069A0C848BD2 /* VOFA2Remote */,
+				AC2B717CBA75DDFC8F048228 /* VOFA2RemoteTests */,
+				61985B1308E7EED06320694A /* VOFA2RemoteUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D420CEADA7D0FE90BC129E42 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5B37903291CD62F362ACF4EF /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0DB8B7975FF4E3014C361BE0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5613496331BA4334857CC283 /* ProtocolTests.swift in Sources */,
+				4F165B54337989BE2DF8FDEA /* RemoteClientTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		78CB5D0E17FCF58344828EF5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1A507CDD94B76031491DB84 /* AppDelegate.swift in Sources */,
+				6329A795D3A778726BD5BE83 /* ControlCells.swift in Sources */,
+				3A9613429857D9FCFC1665BD /* DiscoveryService.swift in Sources */,
+				008C984ACB89E58ADD842DAC /* RemoteClient.swift in Sources */,
+				D7F2BAEA38548F5EA756FFC1 /* RemoteMessage.swift in Sources */,
+				5E9118994DB71E2B66660271 /* RemoteModels.swift in Sources */,
+				758DFB3324330451BEC214B8 /* ServerListViewController.swift in Sources */,
+				B90552F5C032154DBD8018F1 /* Theme.swift in Sources */,
+				E1E37B834F2E2D3DC92BB0BA /* TuningViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA7E4CDDDABC083FCCDE28D2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9EFD012B3AAC44B7DBCD7D3C /* PinFlowUITests.swift in Sources */,
+				9CF42513E27FB9A20953A50D /* TuningUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		90979FAF0352EC6C9BD1138E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 795B6C77A56A069A0C848BD2 /* VOFA2Remote */;
+			targetProxy = CE88C4D4F71039E734EE83CE /* PBXContainerItemProxy */;
+		};
+		F81CC6154827C53A8C92CBBE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 795B6C77A56A069A0C848BD2 /* VOFA2Remote */;
+			targetProxy = F1704159EBA9DA5730950AC1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		09E2B92A98CA6CA8A7ADCA4D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.watyfges.vofa2remote.tests;
+				PRODUCT_MODULE_NAME = VOFA2RemoteTests;
+				PRODUCT_NAME = VOFA2RemoteTests;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/VOFA2Remote.app/VOFA2Remote";
+			};
+			name = Debug;
+		};
+		284E2C49208C0CBAB566D243 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				ENABLE_BITCODE = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = iphoneos;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		31A633413B52EF762D8AB422 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.watyfges.vofa2remote.uitests;
+				PRODUCT_MODULE_NAME = VOFA2RemoteUITests;
+				PRODUCT_NAME = VOFA2RemoteUITests;
+				TEST_TARGET_NAME = VOFA2Remote;
+			};
+			name = Debug;
+		};
+		5C64E5F80604CA3CC0F43D07 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_TESTABILITY = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = VOFA2Remote/Support/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0.0;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.watyfges.vofa2remote;
+				PRODUCT_NAME = VOFA2Remote;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTS_MACCATALYST = NO;
+			};
+			name = Debug;
+		};
+		727EC5D707B36DD4F469B5BF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = VOFA2Remote/Support/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0.0;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.watyfges.vofa2remote;
+				PRODUCT_NAME = VOFA2Remote;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTS_MACCATALYST = NO;
+			};
+			name = Release;
+		};
+		AC790CFF3E3F7CB201D941BF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				ENABLE_BITCODE = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = iphoneos;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		BE710AFF30AA17E182818A1E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.watyfges.vofa2remote.tests;
+				PRODUCT_MODULE_NAME = VOFA2RemoteTests;
+				PRODUCT_NAME = VOFA2RemoteTests;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/VOFA2Remote.app/VOFA2Remote";
+			};
+			name = Release;
+		};
+		E2368FA84FE7232E30BB2867 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.watyfges.vofa2remote.uitests;
+				PRODUCT_MODULE_NAME = VOFA2RemoteUITests;
+				PRODUCT_NAME = VOFA2RemoteUITests;
+				TEST_TARGET_NAME = VOFA2Remote;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		000531F8628A547047888CB6 /* Build configuration list for PBXProject "VOFA2Remote" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				284E2C49208C0CBAB566D243 /* Debug */,
+				AC790CFF3E3F7CB201D941BF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		5978D992D1C3B199426343DF /* Build configuration list for PBXNativeTarget "VOFA2RemoteUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				31A633413B52EF762D8AB422 /* Debug */,
+				E2368FA84FE7232E30BB2867 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9103FFBB1939349F9C51AEE2 /* Build configuration list for PBXNativeTarget "VOFA2RemoteTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				09E2B92A98CA6CA8A7ADCA4D /* Debug */,
+				BE710AFF30AA17E182818A1E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F6533FBF2C816265BBE5BCBF /* Build configuration list for PBXNativeTarget "VOFA2Remote" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5C64E5F80604CA3CC0F43D07 /* Debug */,
+				727EC5D707B36DD4F469B5BF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6F34EAE5E7E7B8D3C2BB711D /* Project object */;
+}

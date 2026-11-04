@@ -1,0 +1,98 @@
+name: VOFA2Remote
+options:
+  bundleIdPrefix: com.watyfges
+  deploymentTarget:
+    iOS: "14.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    ENABLE_BITCODE: NO
+    IPHONEOS_DEPLOYMENT_TARGET: "14.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    CLANG_ENABLE_MODULES: YES
+    SWIFT_TREAT_WARNINGS_AS_ERRORS: NO
+
+targets:
+  VOFA2Remote:
+    type: application
+    platform: iOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: VOFA2Remote
+        excludes:
+          - "Support/Info.plist"
+    settings:
+      base:
+        PRODUCT_NAME: VOFA2Remote
+        PRODUCT_BUNDLE_IDENTIFIER: com.watyfges.vofa2remote
+        INFOPLIST_FILE: VOFA2Remote/Support/Info.plist
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGNING_ALLOWED: NO
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGN_IDENTITY: ""
+        DEVELOPMENT_TEAM: ""
+        PROVISIONING_PROFILE_SPECIFIER: ""
+        SUPPORTS_MACCATALYST: NO
+        ONLY_ACTIVE_ARCH: NO
+        GCC_WARN_UNUSED_VARIABLE: YES
+      configs:
+        Debug:
+          ENABLE_TESTABILITY: YES
+
+  VOFA2RemoteTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: VOFA2RemoteTests
+    dependencies:
+      - target: VOFA2Remote
+    settings:
+      base:
+        PRODUCT_NAME: VOFA2RemoteTests
+        PRODUCT_MODULE_NAME: VOFA2RemoteTests
+        PRODUCT_BUNDLE_IDENTIFIER: com.watyfges.vofa2remote.tests
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        CODE_SIGNING_ALLOWED: NO
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGN_IDENTITY: ""
+        GENERATE_INFOPLIST_FILE: YES
+
+  VOFA2RemoteUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: VOFA2RemoteUITests
+    dependencies:
+      - target: VOFA2Remote
+    settings:
+      base:
+        PRODUCT_NAME: VOFA2RemoteUITests
+        PRODUCT_MODULE_NAME: VOFA2RemoteUITests
+        PRODUCT_BUNDLE_IDENTIFIER: com.watyfges.vofa2remote.uitests
+        CODE_SIGNING_ALLOWED: NO
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGN_IDENTITY: ""
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  VOFA2Remote:
+    build:
+      targets:
+        VOFA2Remote: all
+        VOFA2RemoteTests: [test]
+        VOFA2RemoteUITests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      gatherCoverageData: false
+      targets:
+        - VOFA2RemoteTests
+        - VOFA2RemoteUITests
