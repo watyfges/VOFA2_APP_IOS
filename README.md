@@ -123,6 +123,8 @@ xcodebuild ... test -only-testing:VOFA2RemoteUITests
 | 按钮 300 ms 防抖，收到 `flash` 做点击动效 | `CommandButtonCell` |
 | 自己写入的回声不打断正在拖的滑块 | `ControlCell.applyEcho` + `isDragging` |
 | 一键发送 | 点按钮弹出「一键发送数据」面板：勾选滑块、全选/全不选、改间隔、看进度、可取消（`OneClickSheet`） |
+| 勾选写回 PC | 勾选/全选/全不选发 `{"t":"inc","id":N,"inc":bool}`，等价 PC 的「参与一键发送数据」，持久生效；`state` 回传后勾选框与主界面「一键」标签同步 | `setIncluded` |
+| 旧版服务端降级 | `inc` 得到 `bad_request` 时退化为「只对本次发送生效」，发送走逐条 `commit` | `setInclusionSupported` |
 | 一键发送的两条路径 | 选中项 == PC 勾选的 `inc` 集合时走服务端 `oneclick`（互斥、PC 也显示进度）；否则按勾选逐条 `commit`（`startOneClick`） |
 | PC 未连设备时一键发送 | 服务端回 `not_connected` 并广播 `phase=idle`，App 显示原因并解锁按钮；自定义勾选走本地逐条 `commit`，发送前自查 `conn.connected`（`failOneClick`） |
 | 发送中途断开 | 服务端发 `phase=cancel`（"已中断：连接已断开"）；本地计划遇到 `conn.connected=false` 也会中止（`applyConn`） |
@@ -138,9 +140,7 @@ xcodebuild ... test -only-testing:VOFA2RemoteUITests
 
 - 只做局域网直连，没有 TLS、账号体系、公网穿透（与协议一致）。
 - 组切换用横向标签条展示完整路径（如 `底盘/PID`），没有做树形下拉。
-- **勾选不落盘**：协议里没有改 `controls[].inc` 的消息，所以面板里的勾选只对本次发送有效，
-  PC 的「参与一键发送数据」仍是默认值。想让某项长期参与，请到 PC 的命令编辑里勾选
-  （滑块行上的「一键」标签是 PC 当前勾选状态的只读提示）。
+- 勾选写回需要 PC 端较新的版本（协议 `{"t":"inc"}`）；旧版 PC 会退化成「只对本次发送生效」。
 - 勾选与 PC 计划不一致时走本地逐条 `commit`：下发效果与 PC 一键发送一致（同一套下发函数），
   但 PC 端不显示这次进度，也不占用服务端的「一键发送互斥」。
 - PC 未连接设备时面板会显示橙色提示；两种发送路径都会被拒绝（服务端 `not_connected`，
