@@ -3,6 +3,11 @@ name: Build & Release IPA
 on:
   push:
     branches: [main]
+    # Doc-only changes should not cut a new release.
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - '.gitignore'
   workflow_dispatch:
 
 permissions:

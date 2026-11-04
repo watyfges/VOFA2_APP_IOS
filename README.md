@@ -57,7 +57,22 @@ xcodegen generate     # xcodegen 可用 brew 安装；若只装了 CommandLineTo
                       # 直接下官方 release 的 xcodegen.zip 解压使用
 ```
 
+## 自动构建与发布（GitHub Actions）
+
+推送到 `main` 后 `.github/workflows/release.yml` 会自动：
+
+1. 选最新稳定 Xcode（工程是 Xcode 16 的 `objectVersion 77`，旧 Xcode 打不开）
+2. `MARKETING_VERSION=1.0.<run_number>`、无签名 Release 构建 iPhoneOS
+3. 打包 `Payload/*.app` 成 `.ipa`，校验 `MinimumOSVersion` 与 arm64
+4. 发布 Release（tag `build-<run_number>`），附件就是可直接拖进 TrollStore 的 IPA
+5. 同时留一份 30 天的 workflow artifact
+
+纯文档改动（`**/*.md`、`docs/`）不会触发发布；也可以在 Actions 页面手动
+`Run workflow`。仓库：`github.com/watyfges/VOFA2_APP_IOS`。
+
 ## 打包 IPA（TrollStore）
+
+本地手动打包：
 
 ```bash
 APP=build_device/Build/Products/Release-iphoneos/VOFA2Remote.app
