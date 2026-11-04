@@ -148,6 +148,8 @@ final class ControlCell: UITableViewCell {
     private let slider = UISlider()
     private let minLabel = UILabel()
     private let maxLabel = UILabel()
+    /// Marks sliders the PC has ticked for one-click send (`inc`).
+    private let oneClickTag = UILabel()
 
     private var item: ControlItem?
     private var isDragging = false
@@ -201,10 +203,24 @@ final class ControlCell: UITableViewCell {
         rangeRow.axis = .horizontal
         rangeRow.distribution = .fillEqually
 
-        let topRow = UIStackView(arrangedSubviews: [nameLabel, valueField])
+        oneClickTag.text = "一键"
+        oneClickTag.font = .systemFont(ofSize: 9, weight: .semibold)
+        oneClickTag.textColor = Theme.accent
+        oneClickTag.backgroundColor = Theme.accentSoft
+        oneClickTag.textAlignment = .center
+        oneClickTag.layer.cornerRadius = 3
+        oneClickTag.clipsToBounds = true
+        oneClickTag.setContentHuggingPriority(.required, for: .horizontal)
+        oneClickTag.setContentCompressionResistancePriority(.required, for: .horizontal)
+        oneClickTag.translatesAutoresizingMaskIntoConstraints = false
+        oneClickTag.widthAnchor.constraint(equalToConstant: 28).isActive = true
+        oneClickTag.heightAnchor.constraint(equalToConstant: 14).isActive = true
+        oneClickTag.isHidden = true
+
+        let topRow = UIStackView(arrangedSubviews: [nameLabel, oneClickTag, valueField])
         topRow.axis = .horizontal
         topRow.alignment = .center
-        topRow.spacing = 8
+        topRow.spacing = 6
 
         let stack = UIStackView(arrangedSubviews: [topRow, slider, rangeRow])
         stack.axis = .vertical
@@ -237,6 +253,8 @@ final class ControlCell: UITableViewCell {
         valueField.accessibilityIdentifier = "control.field.\(item.label)"
         valueField.accessibilityLabel = "\(item.label) 数值"
         nameLabel.accessibilityIdentifier = "control.name.\(item.label)"
+        oneClickTag.isHidden = !item.includedInOneClick
+        oneClickTag.accessibilityIdentifier = "control.oneclick.\(item.label)"
 
         // UISlider refuses minimum == maximum, so keep a hair of range.
         let lower = Float(min(item.minimum, item.maximum))

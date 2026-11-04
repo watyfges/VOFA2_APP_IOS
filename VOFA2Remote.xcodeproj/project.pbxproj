@@ -16,6 +16,7 @@
 		6329A795D3A778726BD5BE83 /* ControlCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81462C666860EAF95B81E577 /* ControlCells.swift */; };
 		758DFB3324330451BEC214B8 /* ServerListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C670CCA0026A724AF90BF6F8 /* ServerListViewController.swift */; };
 		9CF42513E27FB9A20953A50D /* TuningUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52053EE328F00BA021F875CE /* TuningUITests.swift */; };
+		9E08DBB8BFD9B07D2FEC9FED /* OneClickSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29917680368CB19BC1A5838B /* OneClickSheet.swift */; };
 		9EFD012B3AAC44B7DBCD7D3C /* PinFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22B20567213DE4575415EA3 /* PinFlowUITests.swift */; };
 		B1A507CDD94B76031491DB84 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3715B603C3FA2E6C21336EC5 /* AppDelegate.swift */; };
 		B90552F5C032154DBD8018F1 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8284CD5550D788B391AD9290 /* Theme.swift */; };
@@ -43,6 +44,7 @@
 /* Begin PBXFileReference section */
 		00EC8868BAA443CEDD56F6EC /* TuningViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuningViewController.swift; sourceTree = "<group>"; };
 		18C6967B8016DEFFEA826B15 /* ProtocolTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtocolTests.swift; sourceTree = "<group>"; };
+		29917680368CB19BC1A5838B /* OneClickSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneClickSheet.swift; sourceTree = "<group>"; };
 		3715B603C3FA2E6C21336EC5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		52053EE328F00BA021F875CE /* TuningUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuningUITests.swift; sourceTree = "<group>"; };
 		5BE4C8390FC11E2D22EB5650 /* VOFA2RemoteTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VOFA2RemoteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -124,6 +126,7 @@
 			children = (
 				3715B603C3FA2E6C21336EC5 /* AppDelegate.swift */,
 				81462C666860EAF95B81E577 /* ControlCells.swift */,
+				29917680368CB19BC1A5838B /* OneClickSheet.swift */,
 				C670CCA0026A724AF90BF6F8 /* ServerListViewController.swift */,
 				8284CD5550D788B391AD9290 /* Theme.swift */,
 				00EC8868BAA443CEDD56F6EC /* TuningViewController.swift */,
@@ -263,6 +266,7 @@
 				B1A507CDD94B76031491DB84 /* AppDelegate.swift in Sources */,
 				6329A795D3A778726BD5BE83 /* ControlCells.swift in Sources */,
 				3A9613429857D9FCFC1665BD /* DiscoveryService.swift in Sources */,
+				9E08DBB8BFD9B07D2FEC9FED /* OneClickSheet.swift in Sources */,
 				008C984ACB89E58ADD842DAC /* RemoteClient.swift in Sources */,
 				D7F2BAEA38548F5EA756FFC1 /* RemoteMessage.swift in Sources */,
 				5E9118994DB71E2B66660271 /* RemoteModels.swift in Sources */,

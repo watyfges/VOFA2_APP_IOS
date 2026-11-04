@@ -84,10 +84,44 @@ final class TuningUITests: XCTestCase {
         XCTAssertTrue(button.waitForExistence(timeout: 5))
         button.tap()
 
-        let status = app.staticTexts["oneclick.status"]
+        // The PC-style sheet, pre-filled from the PC's `inc` ticks.
+        let sendButton = app.buttons["oneclick.sheet.send"]
+        XCTAssertTrue(sendButton.waitForExistence(timeout: 5), "one-click sheet should open")
+        XCTAssertTrue(app.staticTexts["oneclick.sheet.count"].label.contains("已选 3 项"),
+                      "默认组三个滑块在 PC 上都被勾选")
+        sendButton.tap()
+
+        let status = app.staticTexts["oneclick.sheet.status"]
         let finished = NSPredicate(format: "label CONTAINS %@ OR label CONTAINS %@", "完成", "已发送")
         expectation(for: finished, evaluatedWith: status)
         waitForExpectations(timeout: 12)
+    }
+
+    /// Deselecting everything and ticking a single slider must send only that one.
+    func testOneClickSendsOnlyChosenSliders() {
+        let link = app.staticTexts["status.link"]
+        XCTAssertTrue(link.waitForExistence(timeout: 15))
+        expectation(for: NSPredicate(format: "label == %@", "已连接"), evaluatedWith: link)
+        waitForExpectations(timeout: 15)
+
+        app.buttons["group.chip.默认"].tap()
+        app.buttons["oneclick.button"].tap()
+
+        let sendButton = app.buttons["oneclick.sheet.send"]
+        XCTAssertTrue(sendButton.waitForExistence(timeout: 5))
+        app.buttons["oneclick.sheet.selectNone"].tap()
+        XCTAssertTrue(app.staticTexts["oneclick.sheet.count"].label.contains("已选 0 项"))
+        XCTAssertFalse(sendButton.isEnabled, "nothing selected means nothing to send")
+
+        let row = app.cells["oneclick.sheet.item.kp"].firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 5), "slider rows should be listed")
+        row.tap()
+        XCTAssertTrue(app.staticTexts["oneclick.sheet.count"].label.contains("已选 1 项"))
+
+        sendButton.tap()
+        let status = app.staticTexts["oneclick.sheet.status"]
+        expectation(for: NSPredicate(format: "label CONTAINS %@", "完成 1 项"), evaluatedWith: status)
+        waitForExpectations(timeout: 10)
     }
 
     func testSwitchingGroupsChangesVisibleControls() {

@@ -23,6 +23,7 @@ ios/
 │   ├── Net/RemoteClient.swift      # WebSocket 控制通道、节流、心跳、重连
 │   ├── UI/ServerListViewController.swift
 │   ├── UI/TuningViewController.swift
+│   ├── UI/OneClickSheet.swift      # 「一键发送数据」面板（勾选/间隔/进度）
 │   ├── UI/ControlCells.swift       # 开关/按钮/滑块单元格
 │   ├── UI/Theme.swift
 │   └── Support/Info.plist          # 本地网络权限、ATS 本地明文
@@ -104,7 +105,8 @@ xcodebuild ... test -only-testing:VOFA2RemoteUITests
 | 开关设目标状态而非翻转，先乐观更新再以回声为准 | `setSwitch` / `applyAction` |
 | 按钮 300 ms 防抖，收到 `flash` 做点击动效 | `CommandButtonCell` |
 | 自己写入的回声不打断正在拖的滑块 | `ControlCell.applyEcho` + `isDragging` |
-| 一键发送：`sent/total` 进度、`done/cancel/idle` 结束、可中途 `oneclick.stop` | `applyOneClick` |
+| 一键发送 | 点按钮弹出「一键发送数据」面板：勾选滑块、全选/全不选、改间隔、看进度、可取消（`OneClickSheet`） |
+| 一键发送的两条路径 | 选中项 == PC 勾选的 `inc` 集合时走服务端 `oneclick`（互斥、PC 也显示进度）；否则按勾选逐条 `commit` | `startOneClick` |
 | `busy` / `empty_plan` / `unknown_*` / `bad_value` 提示与刷新 | `handleServerError` |
 | 45 s 静默判定掉线，20 s 主动 `ping` | watchdog + heartbeat |
 | 重连退避 1 s→2 s→5 s，最多 5 次；4001 不自动重连 | `scheduleReconnect` |
@@ -117,5 +119,10 @@ xcodebuild ... test -only-testing:VOFA2RemoteUITests
 
 - 只做局域网直连，没有 TLS、账号体系、公网穿透（与协议一致）。
 - 组切换用横向标签条展示完整路径（如 `底盘/PID`），没有做树形下拉。
+- **勾选不落盘**：协议里没有改 `controls[].inc` 的消息，所以面板里的勾选只对本次发送有效，
+  PC 的「参与一键发送数据」仍是默认值。想让某项长期参与，请到 PC 的命令编辑里勾选
+  （滑块行上的「一键」标签是 PC 当前勾选状态的只读提示）。
+- 勾选与 PC 计划不一致时走本地逐条 `commit`：下发效果与 PC 一键发送一致（同一套下发函数），
+  但 PC 端不显示这次进度，也不占用服务端的「一键发送互斥」。
 - iOS 的 WebSocket 由系统库负责回 pong；仍保留 20 s 应用层 `ping` 作为双保险。
 - 首次启动会弹「本地网络」权限，拒绝后只能手动输入 IP 且连接会失败，需到系统设置里重新打开。

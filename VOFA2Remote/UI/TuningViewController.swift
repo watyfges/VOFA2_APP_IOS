@@ -28,6 +28,14 @@ final class TuningViewController: UIViewController {
     private var isSendingOneClick = false
     private var hintResetWork: DispatchWorkItem?
 
+    /// The "一键发送数据" panel, kept so progress can be pushed into it.
+    private weak var oneClickSheet: OneClickSheetViewController?
+    /// Local fallback send used when the selection differs from the PC plan.
+    private var localTimer: DispatchSourceTimer?
+    private var localPlan: [ControlItem] = []
+    private var localTotal = 0
+    private var localSent = 0
+
     private enum Section {
         case actions
         case controls
@@ -112,6 +120,7 @@ final class TuningViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         if isMovingFromParent || isBeingDismissed {
+            stopLocalTimer()
             UIApplication.shared.isIdleTimerDisabled = false
             client.disconnect()
         }
@@ -220,7 +229,7 @@ final class TuningViewController: UIViewController {
         emptyLabel.translatesAutoresizingMaskIntoConstraints = false
 
         // --- bottom bar --------------------------------------------------
-        oneClickButton.setTitle("一键发送当前组", for: .normal)
+        oneClickButton.setTitle("一键发送数据", for: .normal)
         oneClickButton.titleLabel?.font = .preferredFont(forTextStyle: .headline)
         oneClickButton.setTitleColor(.white, for: .normal)
         oneClickButton.backgroundColor = Theme.accent
@@ -455,6 +464,11 @@ final class TuningViewController: UIViewController {
             progressLabel.text = update.status.isEmpty ? "没有可发送的滑块" : update.status
             scheduleProgressHide()
         }
+
+        oneClickSheet?.updateProgress(sent: update.sent,
+                                      total: update.total,
+                                      status: update.status,
+                                      sending: !update.phase.isTerminal)
     }
 
     private func applyConn(_ conn: ConnState) {
@@ -672,7 +686,7 @@ final class TuningViewController: UIViewController {
         } else if case .closed = linkState {
             oneClickButton.setTitle("连接已断开", for: .normal)
         } else {
-            oneClickButton.setTitle("一键发送当前组", for: .normal)
+            oneClickButton.setTitle("一键发送数据", for: .normal)
         }
     }
 
@@ -699,18 +713,131 @@ final class TuningViewController: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: work)
     }
 
+    /// Opens the PC-style "一键发送数据" panel: pick the sliders, then send.
     @objc private func oneClickTapped() {
-        guard let group = currentGroupIfAvailable else {
+        guard let group = currentGroupIfAvailable, let snapshot = snapshot else {
             showPeerHint("请先选择一个命令组")
             return
         }
+        let controls = snapshot.controls(inGroup: group)
+        guard !controls.isEmpty else {
+            showPeerHint("该命令组没有可发送的滑块")
+            return
+        }
+
+        let rows = controls.map { control in
+            OneClickSheetViewController.Row(id: control.id,
+                                            label: control.label,
+                                            valueText: control.formatted(control.value),
+                                            pcIncluded: control.includedInOneClick)
+        }
+        let sheet = OneClickSheetViewController(groupName: group,
+                                                rows: rows,
+                                                intervalMs: snapshot.oneClick.intervalMs)
+        sheet.onSend = { [weak self] ids, intervalMs in
+            self?.startOneClick(ids: ids, intervalMs: intervalMs)
+        }
+        sheet.onStop = { [weak self] in
+            self?.stopOneClick()
+        }
+        sheet.onClose = { [weak self] in
+            self?.oneClickSheet = nil
+        }
+        oneClickSheet = sheet
+        present(sheet, animated: true)
+    }
+
+    /// Uses the server's one-click when the selection matches the PC plan, and a
+    /// local sequenced send otherwise: the protocol has no way to change `inc`.
+    private func startOneClick(ids: [Int], intervalMs: Int) {
+        guard let group = currentGroupIfAvailable, let snapshot = snapshot else { return }
+        let controls = snapshot.controls(inGroup: group)
+        let pcPlan = controls.filter { $0.includedInOneClick }.map { $0.id }
+        let chosen = controls.filter { ids.contains($0.id) }
+        guard !chosen.isEmpty else { return }
+
+        if chosen.map({ $0.id }) == pcPlan {
+            setSending(true)
+            client.startOneClick(group: group, intervalMs: intervalMs)
+        } else {
+            runLocalOneClick(chosen, intervalMs: intervalMs)
+        }
+    }
+
+    private func runLocalOneClick(_ items: [ControlItem], intervalMs: Int) {
+        stopLocalTimer()
+        localPlan = items
+        localTotal = items.count
+        localSent = 0
+
         setSending(true)
-        client.startOneClick(group: group, intervalMs: snapshot?.oneClick.intervalMs)
+        let status = "开始发送（自定义选择 \(localTotal) 项）"
+        progressLabel.text = status
+        progressView.progress = 0
+        oneClickSheet?.updateProgress(sent: 0, total: localTotal, status: status, sending: true)
+
+        let timer = DispatchSource.makeTimerSource(queue: .main)
+        timer.schedule(deadline: .now(), repeating: .milliseconds(max(10, min(5000, intervalMs))))
+        timer.setEventHandler { [weak self] in
+            guard let self = self else { return }
+            guard !self.localPlan.isEmpty else {
+                self.finishLocalOneClick()
+                return
+            }
+            let control = self.localPlan.removeFirst()
+            // A commit is exactly what releasing the slider sends; the PC clamps it
+            // and forwards the same bytes it would for its own one-click send.
+            self.client.commit(id: control.id, value: control.value, exact: false)
+            self.localSent += 1
+            let text = "已发送 \(self.localSent)/\(self.localTotal): \(control.label)"
+            self.progressLabel.text = text
+            if self.localTotal > 0 {
+                self.progressView.progress = Float(self.localSent) / Float(self.localTotal)
+            }
+            self.oneClickSheet?.updateProgress(sent: self.localSent,
+                                               total: self.localTotal,
+                                               status: text,
+                                               sending: true)
+        }
+        localTimer = timer
+        timer.resume()
+    }
+
+    private func finishLocalOneClick() {
+        let total = localTotal
+        let sent = localSent
+        stopLocalTimer()
+        setSending(false)
+        let status = sent >= total ? "完成 \(total) 项" : "已发送 \(sent)/\(total)"
+        progressLabel.text = status
+        progressView.progress = 1
+        oneClickSheet?.updateProgress(sent: sent, total: total, status: status, sending: false)
+        scheduleProgressHide()
+    }
+
+    private func stopOneClick() {
+        if localTimer != nil {
+            let sent = localSent
+            let total = localTotal
+            stopLocalTimer()
+            setSending(false)
+            let status = "已取消（已发送 \(sent)/\(total)）"
+            progressLabel.text = status
+            oneClickSheet?.updateProgress(sent: sent, total: total, status: status, sending: false)
+            scheduleProgressHide()
+        } else {
+            client.stopOneClick()
+        }
+    }
+
+    private func stopLocalTimer() {
+        localTimer?.cancel()
+        localTimer = nil
     }
 
     @objc private func cancelOneClickTapped() {
-        client.stopOneClick()
-        progressLabel.text = "已请求取消…"
+        stopOneClick()
+        progressLabel.text = localTimer == nil ? "已请求取消…" : progressLabel.text
     }
 
     private var currentGroupIfAvailable: String? {
