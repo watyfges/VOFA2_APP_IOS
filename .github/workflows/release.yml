@@ -28,6 +28,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # The project file uses objectVersion 77 (Xcode 16 format), so make sure the
+      # runner picks the newest Xcode image instead of the older default.
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
       - name: Show toolchain
         run: |
           xcodebuild -version
