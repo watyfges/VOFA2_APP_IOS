@@ -20,7 +20,7 @@ concurrency:
 jobs:
   release:
     name: Unsigned IPA
-    runs-on: macos-latest
+    runs-on: macos-15
     timeout-minutes: 30
 
     env:
@@ -33,8 +33,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # The project file uses objectVersion 77 (Xcode 16 format), so make sure the
-      # runner picks the newest Xcode image instead of the older default.
+      # macOS 14 runners were retired on 2026-11-02; macos-15 ships Xcode 16,
+      # which can open our objectVersion 77 project.
       - name: Select Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
