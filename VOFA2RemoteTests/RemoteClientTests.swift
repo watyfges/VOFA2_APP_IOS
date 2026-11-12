@@ -194,6 +194,58 @@ final class RemoteClientTests: XCTestCase {
         client.disconnect()
     }
 
+    // MARK: - 连接面板（link）
+
+    func testLinkOpenAndClose() throws {
+        try XCTSkipUnless(mockServerReachable(), "mock server not running on 127.0.0.1:\(port)")
+
+        let client = makeClient()
+        var latest: PCLinkState?
+        let firstState = expectation(description: "first state")
+        let opened = expectation(description: "link connected")
+        let closed = expectation(description: "link disconnected")
+        firstState.assertForOverFulfill = false
+        opened.assertForOverFulfill = false
+        closed.assertForOverFulfill = false
+        var sawSnapshot = false
+        var waitingForOpen = false
+        var waitingForClose = false
+
+        client.onEvent = { event in
+            if case .snapshot = event, !sawSnapshot {
+                sawSnapshot = true
+                firstState.fulfill()
+                return
+            }
+            guard case .pcLink(let link) = event else { return }
+            latest = link
+            if waitingForOpen, link.isConnected {
+                waitingForOpen = false
+                opened.fulfill()
+            }
+            if waitingForClose, !link.isConnected {
+                waitingForClose = false
+                closed.fulfill()
+            }
+        }
+
+        client.connect()
+        wait(for: [firstState], timeout: 10)
+
+        waitingForOpen = true
+        client.openLink(kind: 4)  // 演示：不依赖硬件
+        wait(for: [opened], timeout: 10)
+        XCTAssertEqual(latest?.kind, 4)
+        XCTAssertEqual(latest?.isConnected, true)
+
+        waitingForClose = true
+        client.closeLink()
+        wait(for: [closed], timeout: 10)
+        XCTAssertEqual(latest?.isConnected, false)
+
+        client.disconnect()
+    }
+
     // MARK: - Access code
     private let pinPort = 47910
 

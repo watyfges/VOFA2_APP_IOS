@@ -63,6 +63,7 @@ enum InboundMessage {
     case action(id: Int, kind: ActionItem.Kind, on: Bool, from: String?, flash: Bool)
     case oneClick(OneClickUpdate)
     case conn(ConnState)
+    case link(PCLinkState)
     case clients(Int)
     case error(code: String, message: String)
     case pong
@@ -116,6 +117,9 @@ enum InboundMessage {
             return .conn(ConnState(isConnected: object.boolean("connected") ?? false,
                                    text: object.str("state") ?? ""))
 
+        case "link":
+            return .link(LinkStateParser.parse(object))
+
         case "clients":
             return .clients(object.integer("count") ?? 0)
 
@@ -132,8 +136,28 @@ enum InboundMessage {
     }
 }
 
-private enum SnapshotParser {
-    static func parse(_ object: [String: Any]) -> RemoteSnapshot {
+/// `state.link` 与 `{"t":"link"}` 共用同一套字段。
+private enum LinkStateParser {
+    static func parse(_ object: [String: Any]) -> PCLinkState {
+        var state = PCLinkState()
+        state.kind = object.integer("kind") ?? 0
+        state.isConnected = object.boolean("connected") ?? false
+        state.text = object.str("state") ?? ""
+        state.ports = (object.list("ports") ?? []).compactMap { $0 as? String }
+        state.serialPort = object.str("serialPort") ?? ""
+        state.baud = object.integer("baud") ?? 115200
+        state.tcpHost = object.str("tcpHost") ?? "127.0.0.1"
+        state.tcpClientPort = object.integer("tcpClientPort") ?? 1346
+        state.tcpServerPort = object.integer("tcpServerPort") ?? 1347
+        state.tcpClients = object.integer("tcpClients") ?? 0
+        state.udpHost = object.str("udpHost") ?? "127.0.0.1"
+        state.udpRemotePort = object.integer("udpRemotePort") ?? 1346
+        state.udpLocalPort = object.integer("udpLocalPort") ?? 1347
+        return state
+    }
+}
+
+private enum SnapshotParser {    static func parse(_ object: [String: Any]) -> RemoteSnapshot {
         let groups = (object.list("groups") ?? []).compactMap { $0 as? String }
 
         let controls: [ControlItem] = (object.list("controls") ?? []).compactMap { element in
@@ -167,6 +191,7 @@ private enum SnapshotParser {
         let connObject = object.object("conn")
         let conn = ConnState(isConnected: connObject?.boolean("connected") ?? false,
                              text: connObject?.str("state") ?? "")
+        let link = object.object("link").map(LinkStateParser.parse) ?? .unknown
 
         let oneClickObject = object.object("oneclick")
         var oneClick = OneClickState.idle
@@ -187,6 +212,7 @@ private enum SnapshotParser {
             controls: controls,
             actions: actions,
             conn: conn,
+            link: link,
             oneClick: oneClick
         )
     }
@@ -240,6 +266,32 @@ enum OutboundMessage {
     /// Toggles 「参与一键发送数据」 on the PC (`controls[].inc`).
     static func inclusion(id: Int, included: Bool) -> String {
         encode(["t": "inc", "id": id, "inc": included])
+    }
+
+    /// 打开 PC 连接。`kind`: 0 串口 / 1 TCP 客户端 / 2 TCP 服务端 / 3 UDP / 4 演示。
+    static func linkOpen(kind: Int,
+                         port: String? = nil,
+                         baud: Int? = nil,
+                         host: String? = nil,
+                         tcpPort: Int? = nil,
+                         remotePort: Int? = nil,
+                         localPort: Int? = nil) -> String {
+        var payload: [String: Any] = ["t": "link", "cmd": "open", "kind": kind]
+        if let port = port, !port.isEmpty { payload["port"] = port }
+        if let baud = baud, baud > 0 { payload["baud"] = baud }
+        if let host = host, !host.isEmpty { payload["host"] = host }
+        if let tcpPort = tcpPort, tcpPort > 0 { payload["port"] = tcpPort }
+        if let remotePort = remotePort, remotePort > 0 { payload["remotePort"] = remotePort }
+        if let localPort = localPort, localPort > 0 { payload["localPort"] = localPort }
+        return encode(payload)
+    }
+
+    static func linkClose() -> String {
+        encode(["t": "link", "cmd": "close"])
+    }
+
+    static func linkRefresh() -> String {
+        encode(["t": "link", "cmd": "refresh"])
     }
 
     static func sync() -> String { "{\"t\":\"sync\"}" }

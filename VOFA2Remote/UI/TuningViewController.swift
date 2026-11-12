@@ -27,6 +27,7 @@ final class TuningViewController: UIViewController {
     private var dragControlID: Int?
     private var isSendingOneClick = false
     private var hintResetWork: DispatchWorkItem?
+    private weak var linkSheet: LinkSheetViewController?
 
     /// The "一键发送数据" panel, kept so progress can be pushed into it.
     private weak var oneClickSheet: OneClickSheetViewController?
@@ -131,11 +132,15 @@ final class TuningViewController: UIViewController {
     // MARK: - UI
 
     private func buildUI() {
+        let linkItem = UIBarButtonItem(image: UIImage(systemName: "link"), style: .plain,
+                                       target: self, action: #selector(linkTapped))
+        linkItem.accessibilityLabel = "连接"
         navigationItem.rightBarButtonItems = [
             UIBarButtonItem(image: UIImage(systemName: "xmark.circle"), style: .plain,
                             target: self, action: #selector(closeTapped)),
             UIBarButtonItem(image: UIImage(systemName: "arrow.triangle.2.circlepath"), style: .plain,
-                            target: self, action: #selector(syncTapped))
+                            target: self, action: #selector(syncTapped)),
+            linkItem
         ]
 
         // --- status card -------------------------------------------------
@@ -365,6 +370,9 @@ final class TuningViewController: UIViewController {
         case .conn(let conn):
             applyConn(conn)
 
+        case .pcLink(let link):
+            applyPCLink(link)
+
         case .clients(let count):
             onlineClients = count
             clientsLabel.text = count > 0 ? "在线 \(count) 台" : ""
@@ -398,6 +406,7 @@ final class TuningViewController: UIViewController {
         updateStatusUI()
         updateOneClickUI(snapshot.oneClick)
         oneClickSheet?.setPCConnected(snapshot.conn.isConnected)
+        linkSheet?.applyState(snapshot.link)
         if let sheet = oneClickSheet, let group = currentGroupIfAvailable {
             let map = Dictionary(uniqueKeysWithValues: snapshot
                 .controls(inGroup: group)
@@ -480,6 +489,15 @@ final class TuningViewController: UIViewController {
                                       sending: !update.phase.isTerminal)
     }
 
+    /// PC 连接面板状态：更新模型并同步给已打开的面板。
+    private func applyPCLink(_ link: PCLinkState) {
+        if var snapshot = snapshot {
+            snapshot.link = link
+            self.snapshot = snapshot
+        }
+        linkSheet?.applyState(link)
+    }
+
     private func applyConn(_ conn: ConnState) {
         if var snapshot = snapshot {
             snapshot.conn = conn
@@ -515,6 +533,15 @@ final class TuningViewController: UIViewController {
             // PC 端没有串口/TCP 对端：一键发送一步都不会走，服务端已同时广播
             // phase=idle 解锁按钮，这里把原因显示出来。
             failOneClick(message: message.isEmpty ? "PC 未连接设备，先连接再发送" : message)
+        case "link_busy":
+            linkSheet?.showError("PC 已经连接，先断开再切换")
+            showPeerHint("PC 已连接，先断开")
+        case "no_port":
+            linkSheet?.showError("PC 上没有可用串口，先刷新端口列表")
+            showPeerHint("没有可用串口")
+        case "bad_link":
+            linkSheet?.showError("连接参数不合法，检查端口/主机")
+            showPeerHint("连接参数不合法")
         case "bad_value":
             showPeerHint("数值不合法，已回退")
         case "bad_request":
@@ -899,6 +926,31 @@ final class TuningViewController: UIViewController {
     @objc private func syncTapped() {
         client.requestSync()
         showPeerHint("已请求同步")
+    }
+
+    /// 打开「PC 连接」面板：手机直接开关 PC 的串口 / TCP / UDP / 演示。
+    @objc private func linkTapped() {
+        let sheet = LinkSheetViewController(state: snapshot?.link ?? .unknown)
+        sheet.onOpen = { [weak self] request in
+            self?.client.openLink(kind: request.kind,
+                                  port: request.port,
+                                  baud: request.baud,
+                                  host: request.host,
+                                  tcpPort: request.tcpPort,
+                                  remotePort: request.remotePort,
+                                  localPort: request.localPort)
+        }
+        sheet.onDisconnect = { [weak self] in
+            self?.client.closeLink()
+        }
+        sheet.onRefreshPorts = { [weak self] in
+            self?.client.refreshPorts()
+        }
+        sheet.onClose = { [weak self] in
+            self?.linkSheet = nil
+        }
+        linkSheet = sheet
+        present(sheet, animated: true)
     }
 
     @objc private func closeTapped() {

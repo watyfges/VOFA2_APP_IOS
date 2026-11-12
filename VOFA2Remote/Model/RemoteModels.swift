@@ -90,6 +90,36 @@ struct ConnState: Equatable {
     static let unknown = ConnState(isConnected: false, text: "")
 }
 
+/// PC 连接面板状态（协议 `state.link` / `link` 消息），手机据此开关 PC 的连接。
+struct PCLinkState: Equatable {
+    static let kindTitles = ["串口", "TCP 客户端", "TCP 服务端", "UDP", "演示"]
+
+    var kind: Int = 0
+    var isConnected: Bool = false
+    var text: String = ""
+    var ports: [String] = []
+    var serialPort: String = ""
+    var baud: Int = 115200
+    var tcpHost: String = "127.0.0.1"
+    var tcpClientPort: Int = 1346
+    var tcpServerPort: Int = 1347
+    var tcpClients: Int = 0
+    var udpHost: String = "127.0.0.1"
+    var udpRemotePort: Int = 1346
+    var udpLocalPort: Int = 1347
+
+    static let unknown = PCLinkState()
+
+    var kindTitle: String {
+        Self.kindTitles.indices.contains(kind) ? Self.kindTitles[kind] : "未知"
+    }
+
+    var statusText: String {
+        guard isConnected else { return "未连接" }
+        return text.isEmpty ? "已连接 · \(kindTitle)" : "已连接 · \(text)"
+    }
+}
+
 /// One-click send progress.
 struct OneClickState: Equatable {
     var isSending: Bool
@@ -116,6 +146,7 @@ struct RemoteSnapshot: Equatable {
     var controls: [ControlItem]
     var actions: [ActionItem]
     var conn: ConnState
+    var link: PCLinkState
     var oneClick: OneClickState
 
     func controls(inGroup group: String) -> [ControlItem] {

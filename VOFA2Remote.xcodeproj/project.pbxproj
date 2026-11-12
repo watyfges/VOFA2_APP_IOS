@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		008C984ACB89E58ADD842DAC /* RemoteClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C9A2CF8F31E187EE6510CB3 /* RemoteClient.swift */; };
 		3A9613429857D9FCFC1665BD /* DiscoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78E5FCFDE83519A015A83AD5 /* DiscoveryService.swift */; };
+		403F0F0287C9FF65298D0909 /* LinkSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697FE66F78A45BA0272477C4 /* LinkSheet.swift */; };
+		4841A596F4E37803964D2AA3 /* LinkSheetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64A59D05A61AD7F9053E872 /* LinkSheetUITests.swift */; };
 		4F165B54337989BE2DF8FDEA /* RemoteClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61DB5DF5C7FE9E72537A707F /* RemoteClientTests.swift */; };
 		5613496331BA4334857CC283 /* ProtocolTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C6967B8016DEFFEA826B15 /* ProtocolTests.swift */; };
 		5B37903291CD62F362ACF4EF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B3F96635AEF1AA2F43440429 /* Assets.xcassets */; };
@@ -52,6 +54,7 @@
 		52053EE328F00BA021F875CE /* TuningUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuningUITests.swift; sourceTree = "<group>"; };
 		5BE4C8390FC11E2D22EB5650 /* VOFA2RemoteTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VOFA2RemoteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		61DB5DF5C7FE9E72537A707F /* RemoteClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteClientTests.swift; sourceTree = "<group>"; };
+		697FE66F78A45BA0272477C4 /* LinkSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkSheet.swift; sourceTree = "<group>"; };
 		78E5FCFDE83519A015A83AD5 /* DiscoveryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryService.swift; sourceTree = "<group>"; };
 		7C9A2CF8F31E187EE6510CB3 /* RemoteClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteClient.swift; sourceTree = "<group>"; };
 		81462C666860EAF95B81E577 /* ControlCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlCells.swift; sourceTree = "<group>"; };
@@ -64,6 +67,7 @@
 		C670CCA0026A724AF90BF6F8 /* ServerListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerListViewController.swift; sourceTree = "<group>"; };
 		D22B20567213DE4575415EA3 /* PinFlowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinFlowUITests.swift; sourceTree = "<group>"; };
 		D95DA4BF33D852912260592B /* RemoteMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessage.swift; sourceTree = "<group>"; };
+		F64A59D05A61AD7F9053E872 /* LinkSheetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkSheetUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -109,6 +113,7 @@
 			isa = PBXGroup;
 			children = (
 				38F83F428C26181967836A15 /* LegacyInclusionUITests.swift */,
+				F64A59D05A61AD7F9053E872 /* LinkSheetUITests.swift */,
 				8A7778D4D1F0C467FA582E47 /* OneClickOfflineUITests.swift */,
 				D22B20567213DE4575415EA3 /* PinFlowUITests.swift */,
 				52053EE328F00BA021F875CE /* TuningUITests.swift */,
@@ -132,6 +137,7 @@
 			children = (
 				3715B603C3FA2E6C21336EC5 /* AppDelegate.swift */,
 				81462C666860EAF95B81E577 /* ControlCells.swift */,
+				697FE66F78A45BA0272477C4 /* LinkSheet.swift */,
 				29917680368CB19BC1A5838B /* OneClickSheet.swift */,
 				C670CCA0026A724AF90BF6F8 /* ServerListViewController.swift */,
 				8284CD5550D788B391AD9290 /* Theme.swift */,
@@ -272,6 +278,7 @@
 				B1A507CDD94B76031491DB84 /* AppDelegate.swift in Sources */,
 				6329A795D3A778726BD5BE83 /* ControlCells.swift in Sources */,
 				3A9613429857D9FCFC1665BD /* DiscoveryService.swift in Sources */,
+				403F0F0287C9FF65298D0909 /* LinkSheet.swift in Sources */,
 				9E08DBB8BFD9B07D2FEC9FED /* OneClickSheet.swift in Sources */,
 				008C984ACB89E58ADD842DAC /* RemoteClient.swift in Sources */,
 				D7F2BAEA38548F5EA756FFC1 /* RemoteMessage.swift in Sources */,
@@ -287,6 +294,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AF1C2C2519407B9F71A2C287 /* LegacyInclusionUITests.swift in Sources */,
+				4841A596F4E37803964D2AA3 /* LinkSheetUITests.swift in Sources */,
 				ED0A7C78531DF0EF276C3823 /* OneClickOfflineUITests.swift in Sources */,
 				9EFD012B3AAC44B7DBCD7D3C /* PinFlowUITests.swift in Sources */,
 				9CF42513E27FB9A20953A50D /* TuningUITests.swift in Sources */,

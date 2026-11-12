@@ -111,6 +111,23 @@ class Model:
         ]
         self.conn_connected = True
         self.conn_text = "已连接"
+        # link 与 conn 解耦：连接面板默认未连接，conn 仍表示“PC 认为有设备”，
+        # 这样两类测试互不影响。
+        self.link = {
+            "kind": 0,
+            "connected": False,
+            "state": "未连接",
+            "ports": ["COM3", "COM4"],
+            "serialPort": "COM3",
+            "baud": 115200,
+            "tcpHost": "127.0.0.1",
+            "tcpClientPort": 1346,
+            "tcpServerPort": 1347,
+            "tcpClients": 0,
+            "udpHost": "127.0.0.1",
+            "udpRemotePort": 1346,
+            "udpLocalPort": 1347,
+        }
         self.seq = 0
         self.oneclick = {"sending": False, "sent": 0, "total": 0, "status": "", "interval": 100}
 
@@ -128,6 +145,7 @@ class Model:
                 "controls": [c.to_json() for c in self.controls],
                 "actions": [a.to_json() for a in self.actions],
                 "conn": {"connected": self.conn_connected, "state": self.conn_text},
+                "link": dict(self.link),
                 "oneclick": dict(self.oneclick),
             }
 
@@ -519,6 +537,9 @@ class Server:
             self.log(f"inc {control.label} -> {flag}")
             self.broadcast(model.state_payload())
 
+        elif kind == "link":
+            self.handle_link(client, message, model, origin)
+
         elif kind == "oneclick":
             self.start_oneclick(client, message)
 
@@ -539,6 +560,58 @@ class Server:
 
         else:
             client.send_json({"t": "error", "code": "bad_request", "message": f"未知类型 {kind}"})
+
+    def handle_link(self, client, message, model, origin):
+        cmd = message.get("cmd")
+        if cmd == "refresh":
+            self.broadcast({"t": "link", **model.link})
+            return
+        if cmd == "close":
+            with model.lock:
+                model.link["connected"] = False
+                model.link["state"] = "未连接"
+                payload = dict(model.link)
+            self.broadcast({"t": "link", **payload})
+            self.broadcast(model.state_payload())
+            return
+        if cmd != "open":
+            client.send_json({"t": "error", "code": "bad_request",
+                              "message": "link.cmd 只能是 open/close/refresh"})
+            return
+        if model.link["connected"]:
+            client.send_json({"t": "error", "code": "link_busy", "message": "请先断开"})
+            return
+
+        kind = message.get("kind")
+        if not isinstance(kind, int) or not 0 <= kind <= 4:
+            client.send_json({"t": "error", "code": "bad_link", "message": "kind 不合法"})
+            return
+
+        port = message.get("port")
+        if kind == 0 and not (isinstance(port, str) and port) and not model.link["serialPort"]:
+            client.send_json({"t": "error", "code": "no_port", "message": "没有可用串口"})
+            return
+
+        names = ["串口", "TCP 客户端", "TCP 服务端", "UDP", "演示"]
+        with model.lock:
+            model.link["kind"] = kind
+            model.link["connected"] = True
+            model.link["state"] = names[kind]
+            if isinstance(port, str) and port:
+                model.link["serialPort"] = port
+            baud = message.get("baud")
+            if isinstance(baud, int) and baud > 0:
+                model.link["baud"] = baud
+            if isinstance(port, int) and port > 0:
+                if kind == 1:
+                    model.link["tcpClientPort"] = port
+                elif kind == 2:
+                    model.link["tcpServerPort"] = port
+            payload = dict(model.link)
+
+        self.log(f"link open kind={kind} port={port}")
+        self.broadcast({"t": "link", **payload})
+        self.broadcast(model.state_payload())
 
     def start_oneclick(self, client, message):
         model = self.model
@@ -648,6 +721,8 @@ def main():
     if args.offline:
         model.conn_connected = False
         model.conn_text = "未连接"
+        model.link["connected"] = False
+        model.link["state"] = "未连接"
     server = Server(model, args.port, args.discovery_port, verbose=not args.quiet,
                     legacy=args.legacy)
     print(f"mock server '{args.name}' control={args.port} discovery={args.discovery_port} "

@@ -24,6 +24,7 @@ ios/
 │   ├── UI/ServerListViewController.swift
 │   ├── UI/TuningViewController.swift
 │   ├── UI/OneClickSheet.swift      # 「一键发送数据」面板（勾选/间隔/进度）
+│   ├── UI/LinkSheet.swift          # 「PC 连接」面板（串口/TCP/UDP/演示）
 │   ├── UI/ControlCells.swift       # 开关/按钮/滑块单元格
 │   ├── UI/Theme.swift
 │   └── Support/Info.plist          # 本地网络权限、ATS 本地明文
@@ -96,12 +97,12 @@ python3 tools/mock_remote_server.py --port 47920 --discovery-port 47921 \
 ```
 
 ```bash
-# 协议 + 网络集成（15 项）
+# 协议 + 网络集成（17 项）
 xcodebuild -project VOFA2Remote.xcodeproj -scheme VOFA2Remote \
   -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 14' \
   test -only-testing:VOFA2RemoteTests
 
-# UI 自动化（8 项：连接、滑块、开关、一键发送、访问码、离线拒发）
+# UI 自动化（11 项：连接、滑块、开关、一键发送、访问码、离线拒发、旧版降级、连接面板）
 xcodebuild ... test -only-testing:VOFA2RemoteUITests
 ```
 
@@ -123,6 +124,8 @@ xcodebuild ... test -only-testing:VOFA2RemoteUITests
 | 按钮 300 ms 防抖，收到 `flash` 做点击动效 | `CommandButtonCell` |
 | 自己写入的回声不打断正在拖的滑块 | `ControlCell.applyEcho` + `isDragging` |
 | 一键发送 | 点按钮弹出「一键发送数据」面板：勾选滑块、全选/全不选、改间隔、看进度、可取消（`OneClickSheet`） |
+| PC 连接控制 | 导航栏「连接」面板直接开关 PC 的串口 / TCP 客户端 / TCP 服务端 / UDP / 演示：`{"t":"link","cmd":"open\\|close\\|refresh",...}`；结果以服务端推回的 `link`/`state` 为准（`LinkSheet`） |
+| 连接面板状态 | `state.link` 与 `link` 增量消息同构：`kind`/`connected`/`state`/`ports`/串口与波特率/TCP 端口与客户端数 |
 | 勾选写回 PC | 勾选/全选/全不选发 `{"t":"inc","id":N,"inc":bool}`，等价 PC 的「参与一键发送数据」，持久生效；`state` 回传后勾选框与主界面「一键」标签同步 | `setIncluded` |
 | 旧版服务端降级 | `inc` 得到 `bad_request` 时退化为「只对本次发送生效」，发送走逐条 `commit` | `setInclusionSupported` |
 | 一键发送的两条路径 | 选中项 == PC 勾选的 `inc` 集合时走服务端 `oneclick`（互斥、PC 也显示进度）；否则按勾选逐条 `commit`（`startOneClick`） |

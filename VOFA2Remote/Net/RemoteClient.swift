@@ -30,6 +30,7 @@ enum RemoteEvent {
     case action(id: Int, kind: ActionItem.Kind, on: Bool, from: String?, flash: Bool)
     case oneClick(OneClickUpdate)
     case conn(ConnState)
+    case pcLink(PCLinkState)
     case clients(Int)
     case serverError(code: String, message: String)
     case terminated(code: Int, reason: String)
@@ -328,6 +329,9 @@ final class RemoteClient {
         case .conn(let conn):
             emit(.conn(conn))
 
+        case .link(let link):
+            emit(.pcLink(link))
+
         case .clients(let count):
             emit(.clients(count))
 
@@ -411,6 +415,38 @@ final class RemoteClient {
     func setIncluded(id: Int, included: Bool) {
         queue.async { [weak self] in
             self?.send(OutboundMessage.inclusion(id: id, included: included))
+        }
+    }
+
+    // MARK: - Connection panel
+
+    func openLink(kind: Int,
+                  port: String? = nil,
+                  baud: Int? = nil,
+                  host: String? = nil,
+                  tcpPort: Int? = nil,
+                  remotePort: Int? = nil,
+                  localPort: Int? = nil) {
+        queue.async { [weak self] in
+            self?.send(OutboundMessage.linkOpen(kind: kind,
+                                                port: port,
+                                                baud: baud,
+                                                host: host,
+                                                tcpPort: tcpPort,
+                                                remotePort: remotePort,
+                                                localPort: localPort))
+        }
+    }
+
+    func closeLink() {
+        queue.async { [weak self] in
+            self?.send(OutboundMessage.linkClose())
+        }
+    }
+
+    func refreshPorts() {
+        queue.async { [weak self] in
+            self?.send(OutboundMessage.linkRefresh())
         }
     }
 
