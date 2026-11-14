@@ -37,9 +37,9 @@ final class LinkSheetUITests: XCTestCase {
         XCTAssertTrue(status.waitForExistence(timeout: 5), "连接面板应打开")
         XCTAssertTrue(status.label.contains("未连接"), "初始应为未连接：\(status.label)")
 
-        let kind = app.segmentedControls["link.sheet.kind"]
-        XCTAssertTrue(kind.waitForExistence(timeout: 3))
-        kind.buttons["演示"].tap()
+        let demo = app.buttons["link.sheet.kind.4"]
+        XCTAssertTrue(demo.waitForExistence(timeout: 3))
+        demo.tap()
 
         let action = app.buttons["link.sheet.action"]
         XCTAssertEqual(action.label, "连接")

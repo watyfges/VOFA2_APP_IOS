@@ -30,7 +30,10 @@ final class LinkSheetViewController: UIViewController {
     private var userPickedKind = false
 
     private let statusLabel = UILabel()
-    private let kindControl = UISegmentedControl(items: PCLinkState.kindTitles)
+    private let kindScroll = UIScrollView()
+    private let kindStack = UIStackView()
+    private var kindButtons: [UIButton] = []
+    private var selectedKind = 0
     private let portButton = UIButton(type: .system)
     private let baudField = InsetTextField()
     private let hostField = InsetTextField()
@@ -95,9 +98,8 @@ final class LinkSheetViewController: UIViewController {
         statusLabel.numberOfLines = 2
         statusLabel.accessibilityIdentifier = "link.sheet.status"
 
-        kindControl.selectedSegmentIndex = state.kind
-        kindControl.addTarget(self, action: #selector(kindChanged), for: .valueChanged)
-        kindControl.accessibilityIdentifier = "link.sheet.kind"
+        selectedKind = max(0, min(4, state.kind))
+        buildKindChips()
 
         // 串口
         portButton.contentHorizontalAlignment = .left
@@ -211,7 +213,7 @@ final class LinkSheetViewController: UIViewController {
         buttonsRow.alignment = .center
 
         let stack = UIStackView(arrangedSubviews: [
-            titleRow, statusLabel, kindControl,
+            titleRow, statusLabel, kindScroll,
             serialBox, clientBox, serverBox, udpBox, demoBox,
             hintLabel, buttonsRow
         ])
@@ -260,7 +262,8 @@ final class LinkSheetViewController: UIViewController {
         statusLabel.textColor = newState.isConnected ? Theme.accent : .secondaryLabel
 
         if forceKind || !userPickedKind {
-            kindControl.selectedSegmentIndex = max(0, min(4, newState.kind))
+            selectedKind = max(0, min(4, newState.kind))
+            updateKindChips()
         }
 
         if !newState.ports.isEmpty {
@@ -273,7 +276,7 @@ final class LinkSheetViewController: UIViewController {
 
         actionButton.setTitle(newState.isConnected ? "断开" : "连接", for: .normal)
         actionButton.backgroundColor = newState.isConnected ? Theme.danger : Theme.accent
-        refreshButton.isHidden = kindControl.selectedSegmentIndex != 0
+        refreshButton.isHidden = selectedKind != 0
         updateVisibleBox()
     }
 
@@ -294,7 +297,7 @@ final class LinkSheetViewController: UIViewController {
     }
 
     private func updateVisibleBox() {
-        let kind = kindControl.selectedSegmentIndex
+        let kind = selectedKind
         serialBox.isHidden = kind != 0
         clientBox.isHidden = kind != 1
         serverBox.isHidden = kind != 2
@@ -304,10 +307,61 @@ final class LinkSheetViewController: UIViewController {
 
     // MARK: - Actions
 
-    @objc private func kindChanged() {
+    @objc private func kindChipTapped(_ sender: UIButton) {
+        selectedKind = sender.tag
         userPickedKind = true
+        updateKindChips()
         updateVisibleBox()
-        refreshButton.isHidden = kindControl.selectedSegmentIndex != 0
+        refreshButton.isHidden = selectedKind != 0
+    }
+
+    /// 五段横向胶囊：分段控件在 iPhone 上会把「TCP 客户端」截断。
+    private func buildKindChips() {
+        kindScroll.showsHorizontalScrollIndicator = false
+        kindScroll.translatesAutoresizingMaskIntoConstraints = false
+        kindScroll.accessibilityIdentifier = "link.sheet.kind"
+        kindScroll.heightAnchor.constraint(equalToConstant: 36).isActive = true
+
+        kindStack.axis = .horizontal
+        kindStack.spacing = 6
+        kindStack.translatesAutoresizingMaskIntoConstraints = false
+        kindScroll.addSubview(kindStack)
+
+        NSLayoutConstraint.activate([
+            kindStack.leadingAnchor.constraint(equalTo: kindScroll.contentLayoutGuide.leadingAnchor),
+            kindStack.trailingAnchor.constraint(equalTo: kindScroll.contentLayoutGuide.trailingAnchor),
+            kindStack.topAnchor.constraint(equalTo: kindScroll.contentLayoutGuide.topAnchor),
+            kindStack.bottomAnchor.constraint(equalTo: kindScroll.contentLayoutGuide.bottomAnchor),
+            kindStack.heightAnchor.constraint(equalTo: kindScroll.frameLayoutGuide.heightAnchor)
+        ])
+
+        for (index, title) in PCLinkState.kindTitles.enumerated() {
+            let button = UIButton(type: .system)
+            button.setTitle(title, for: .normal)
+            button.titleLabel?.font = .systemFont(ofSize: 12, weight: .medium)
+            button.contentEdgeInsets = UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10)
+            button.layer.cornerRadius = 18
+            button.tag = index
+            button.accessibilityIdentifier = "link.sheet.kind.\(index)"
+            button.addTarget(self, action: #selector(kindChipTapped(_:)), for: .touchUpInside)
+            kindStack.addArrangedSubview(button)
+            kindButtons.append(button)
+        }
+        updateKindChips()
+    }
+
+    private func updateKindChips() {
+        for (index, button) in kindButtons.enumerated() {
+            let isSelected = index == selectedKind
+            button.backgroundColor = isSelected ? Theme.accent : .secondarySystemFill
+            button.setTitleColor(isSelected ? .white : .label, for: .normal)
+        }
+        // 小屏放不下五项：把当前选中项滚进视野，别让人以为没选中。
+        kindScroll.layoutIfNeeded()
+        if kindButtons.indices.contains(selectedKind) {
+            let target = kindButtons[selectedKind].frame.insetBy(dx: -8, dy: 0)
+            kindScroll.scrollRectToVisible(target, animated: false)
+        }
     }
 
     @objc private func closeTapped() {
@@ -325,7 +379,7 @@ final class LinkSheetViewController: UIViewController {
             return
         }
 
-        var request = LinkRequest(kind: max(0, kindControl.selectedSegmentIndex))
+        var request = LinkRequest(kind: max(0, selectedKind))
         switch request.kind {
         case 0:
             request.port = portButton.title(for: .normal) == "选择端口"
